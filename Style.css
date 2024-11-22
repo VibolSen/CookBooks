@@ -1,0 +1,665 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    width: auto;
+  }
+  
+  header {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border-bottom: 3px solid #e0e0e0;
+    height: 120px;
+  }
+  
+  .logo img {
+    margin: 0px 35px;
+    width: 80px;
+  }
+  
+  nav .menu {
+    display: flex;
+    list-style: none;
+    margin-left: 30px;
+  }
+  
+  .menu li {
+    margin-right: 50px;
+  }
+  
+  .menu a {
+    font-size: 17px;
+    color: #000000;
+    text-decoration: none;
+  }
+  
+  .menu a:hover {
+    color: #0000ff;
+  }
+  
+  .search input {
+    font-size: 15px;
+    border-radius: 20px;
+    border: 1px solid #cccccc;
+    width: 380px;
+    height: 40px;
+    margin-left: 70px;
+    padding: 5px 10px;
+  }
+  
+  .add_recipe a {
+    font-size: 17px;
+    text-decoration: none;
+    color: #000000;
+    margin-left: 150px;
+  }
+  
+  .login a {
+    background-color: #0081FE;
+    color: #ffffff;
+    padding: 10px 40px;
+    border-radius: 20px;
+    font-size: 15px;
+    text-decoration: none;
+    margin-left: 40px;
+  }
+  .login a:hover{
+    color: #ffffff;
+  }
+
+.profile img{
+  object-fit: cover;
+  height: auto;
+  width: 45px;
+  transform: scale(0.9);
+
+}
+.profile img:hover{
+  transform: scale(1.1);
+}
+
+.save {
+  width: 20px;
+  height: 35px;
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 5px 5px 5px 5px;
+  clip-path: polygon(0 100%, 47% 65%, 100% 100%, 100% 0, 0 0);
+  cursor: pointer;
+  background-color: #8b8b8b;
+  margin: 0px 25px;
+  margin-left: 50px;
+  transform: scale(0.9);
+}
+.save:hover{
+  background-color: #000000;
+  transform: scale(1.1);
+}
+
+  .sub-menu {
+    padding: 15px 0px;
+    border-bottom: 2px solid #e0e0e0;
+  }
+  
+  .sub-menu ul {
+    display: flex;
+    list-style: none;
+    justify-content: flex-start;
+    margin-left: 180px;
+  }
+  
+  .sub-menu li {
+    margin-right: 20px;
+  }
+  
+  .sub-menu a {
+    font-size: 16px;
+    color: #000000;
+    text-decoration: none;
+  }
+  
+  .sub-menu a:hover {
+    color: #0000ff;
+  }
+  .container {
+    padding: 10px;
+    height: auto;
+    width: 1400px;
+    margin: 0 auto; 
+    background-color: #FAFAFA;
+}
+
+.swiper {
+  width: 100%;
+  height: 100%; 
+  border-radius: 20px;
+}
+
+.swiper-slide {
+  text-align: center;
+  font-size: 18px;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+  height: auto; /* Change to auto to maintain aspect ratio */
+  object-fit: cover;
+  border-radius: 20px;
+}
+
+.title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 15px;
+}
+a{
+  color: #000000;
+}
+a:hover{
+  color: #0000ff;
+}
+.text p{
+  padding: 10px 5px;
+}
+.title h1{
+  font-size: 40px;
+}
+.title_card h2 {
+  padding: 5px 5px;
+}
+.title_card p {
+  padding: 0px 5px;
+}
+.card_item {
+    width: 320px;
+    height: 340px;
+    display: inline;
+    margin: 30px 10px;
+}
+.card_item img {
+  border-radius: 5px;
+    height: 210px;
+    width: 320px;
+    object-fit: cover;
+}
+.image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.bookmark-button {
+  width: 30px;
+  height: 45px;
+  background-color: #ffffff;
+  border-radius: 5px 5px 5px 5px;
+  clip-path: polygon(0 100%, 47% 65%, 100% 100%, 100% 0, 0 0);
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
+.bookmark-button:hover {
+  color: #407948;
+  background-color: #000000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transform: scale(1.05);
+}
+
+
+
+.rating {
+  margin-bottom: 20px;
+    display: flex;
+    font-size: 2rem;
+    cursor: pointer;
+}
+.rating input {
+    display: none;
+}
+.rating label {
+    color: #407948;
+    transition: color 0.2s;
+}
+.rating input:checked ~ label,
+.rating label:hover,
+.rating label:hover ~ label {
+    color: gold;
+}
+.rating label:hover ~ label {
+    color: #3f2dff;
+}
+.footer-container {
+  padding: 20px 0px;
+  display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #2877fa;
+}
+
+.footer-menu ul{
+  font-size: 15px;
+  display: flex;
+  list-style: none;
+}
+.footer-menu ul li {
+  padding: 10px 25px;
+}
+.footer-menu ul li a {
+  text-decoration: none;
+}
+.footer-menu li a:hover{
+  color: #0000ff;
+}
+.logo-footer img{
+  margin-top: 20px;
+  margin-left: 200px;
+  padding: 15px 0px;
+    width: 130px;
+}
+.footer-info {
+  height: 30px;
+  padding: 50px 20px;
+}
+.contact {
+  margin: 15px 10px;
+}
+.contact i{
+  padding: 0px 10px;
+  color: #0081FE;
+}
+.social-media {
+  display: flex;
+}
+.social-media p {
+  font-size: 16px;
+  padding: 0px 15px;
+}
+.social-media i{
+  padding: 0px 20px;
+  color: #0081FE;
+  font-size: 20px;
+}
+
+.recipe-card {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+  overflow: hidden;
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 10px 20px;
+  font-family: Arial, sans-serif;
+  background-color: #FAFAFA;
+}
+
+.recipe-card img {
+  width: 460px;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.recipe-info {
+  margin-bottom: 60px;
+  padding: 40px;
+}
+
+.recipe-info h2 {
+  font-size: 40px;
+  color: #333;
+}
+.recipe-info p {
+  padding: 10px;
+  font-size: 20px;
+}
+
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #eaf8ff;
+  width: 1400px;
+  height: 350px;
+  margin: 20px 0px;
+  border-radius: 20px;
+  position: relative;
+  right: 10px;
+}
+
+/* Text Content */
+.hero-content {
+  z-index: 2;
+}
+
+.hero-content h1 {
+  font-size: 45px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40px;
+}
+
+.hero-content p {
+  font-size: 18px;
+  color: #555;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Left Image */
+.left-image {
+  position: absolute;
+  left: 0px;
+  top: 65px;
+  height: 90%;
+}
+
+.left-image img {
+  height: 90%;
+  object-fit: contain;
+}
+
+/* Right Image */
+.right-image {
+  position: absolute;
+  right: 0px;
+  top: 15px;
+  height: 90%;
+}
+
+.right-image img {
+  height: 70%;
+  object-fit: contain;
+  border-radius: 15px;
+  margin-top: 115px;
+}
+
+
+
+.container-form {
+  display: flex; 
+  max-width: 1200px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+  overflow: hidden;
+  margin: auto;
+  margin-top: 30px;
+}
+
+.container-form-signup {
+  display: flex; 
+  max-width: 1200px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+  overflow: hidden;
+  margin: auto;
+}
+
+.login-form {
+  width: 50%; 
+  padding: 40px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-form h1 {
+  font-size: 35px;
+  color: #333;
+  padding: 5px 0px;
+  margin-bottom: 30px;
+}
+
+.login-form p {
+  margin-bottom: 10px;
+  color: #666;
+  padding: 5px 0px;
+}
+
+.login-form p a {
+  color: #2877fa;
+  text-decoration: none;
+}
+
+.login-form p a:hover {
+  text-decoration: underline;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.input-group label {
+  font-size: 14px;
+  color: #555;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  height: 45px;
+  margin-top: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  box-sizing: border-box;
+}
+
+.checkbox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #555;
+  padding: 10px 0px;
+}
+.checkbox a {
+  color: #2877fa;
+  text-decoration: none;
+}
+
+.checkbox a:hover {
+  text-decoration: underline;
+}
+
+.button-login {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  height: 20%; 
+}
+.button-login a.button {
+  width: 70%;
+  padding: 10px;
+  margin: 5px 0;
+  font-size: 18px;
+  height: 45px;
+  color: #fff;
+  background-color: #2877fa;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  text-decoration: none; 
+  display: inline-block; 
+  text-align: center; 
+  transition: background-color 0.3s;
+}
+
+.button-login a.button:hover {
+  background-color: #1b5fb8; 
+}
+.divider {
+  margin: 20px 0;
+  text-align: center;
+  position: relative;
+}
+
+.divider span {
+  background-color: #fff;
+  padding: 0 10px;
+  position: relative;
+  z-index: 1;
+  font-size: 14px;
+  color: #aaa;
+}
+
+.divider:before {
+  content: "";
+  height: 1px;
+  width: 100%;
+  background-color: #ccc;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 0;
+}
+
+.social-login {
+  display: flex;
+  justify-content: space-between;
+}
+
+.social-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 48%;
+  text-decoration: none;
+}
+
+.social-button img {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+}
+
+.social-button.facebook {
+  border-color: #1877f2;
+  color: #1877f2;
+}
+
+.social-button.facebook:hover {
+  background-color: #1877f2;
+  color: white;
+}
+
+.social-button.google {
+  border-color: #1877f2;
+  color: #1877f2;
+}
+
+.social-button.google:hover {
+  background-color: #1877f2;
+  color: white;
+}
+
+.images-login {
+  width: 50%; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* background-color: #f9f9f9; */
+}
+
+.images-login img {
+  width: 80%; 
+  height: auto;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width: 1400px) {
+  .slider {
+      width: 100%;
+      height: auto;
+  }
+
+  .slides {
+      width: 400%; /* This remains proportional */
+  }
+
+  .slide img {
+      width: 100%;
+      height: auto;
+  }
+}
