@@ -93,8 +93,8 @@
   clip-path: polygon(0 100%, 47% 65%, 100% 100%, 100% 0, 0 0);
   cursor: pointer;
   background-color: #8b8b8b;
-  margin: 0px 25px;
-  margin-left: 50px;
+  margin: 0px 15px;
+  margin-left: 60px;
   transform: scale(0.9);
 }
 .save:hover{
