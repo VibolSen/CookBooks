@@ -118,12 +118,11 @@
 .save {
   width: 20px;
   height: 35px;
-  background-color: #ffffff;
   border: 1px solid #000000;
   border-radius: 5px 5px 5px 5px;
   clip-path: polygon(0 100%, 47% 65%, 100% 100%, 100% 0, 0 0);
   cursor: pointer;
-  background-color: #8b8b8b;
+  background-color: #333ce7;
   margin: 0px 15px;
   margin-left: 60px;
   transform: scale(0.9);
