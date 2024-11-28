@@ -652,3 +652,58 @@ a:hover{
       height: auto;
   }
 }
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  header {
+      flex-direction: column;
+      height: auto; /* Adjust height dynamically */
+      align-items: flex-start; /* Align items to the left */
+  }
+
+  .menu {
+      flex-direction: column; /* Stack menu items vertically */
+      align-items: flex-start;
+      margin: 10px 0;
+  }
+
+  .menu li {
+      margin: 10px 0;
+  }
+
+  .search {
+      width: 100%; /* Full width for smaller screens */
+      margin: 10px 0;
+  }
+
+  .add_recipe,
+  .login {
+      margin: 10px 0;
+      align-self: flex-start; /* Align to the left */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  form.example input[type="text"] {
+      font-size: 12px;
+      width: 65%;
+  }
+
+  form.example button {
+      width: 35%;
+      font-size: 12px;
+  }
+
+  .logo img {
+      width: 50px; /* Reduce size for smaller screens */
+  }
+
+  .menu a {
+      font-size: 14px;
+  }
+
+  .add_recipe a,
+  .login a {
+      font-size: 12px;
+      padding: 8px 15px;
+  }
+}
