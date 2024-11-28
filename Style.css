@@ -27,6 +27,7 @@
     display: flex;
     list-style: none;
     margin-left: 8px;
+    font-family: Arial, sans-serif;
   }
   
   .menu li {
@@ -37,6 +38,7 @@
     font-size: 17px;
     color: #000000;
     text-decoration: none;
+    font-family: Arial, sans-serif;
   }
   
   .menu a:hover {
@@ -48,7 +50,6 @@
     justify-content: space-between;
   }
   form.example input[type=text] {
-    padding: 10px;
     padding: 0px 50px;
     border-radius: 30px 0 0 30px;
     font-size: 17px;
@@ -57,6 +58,10 @@
     width: 300px;
     background: #f1f1f1;
   }
+  form.example input[type="text"]:focus {
+    outline: none; /* Removes the focus outline */
+    border: 1px solid rgba(128, 128, 128, 0.578); /* Keeps the same border style on focus */
+}
   .example{
     width: 400px;
     display: flex;
@@ -118,17 +123,18 @@
 .save {
   width: 20px;
   height: 35px;
-  border: 1px solid #000000;
+
+  border: 1px solid #2196f3;
   border-radius: 5px 5px 5px 5px;
   clip-path: polygon(0 100%, 47% 65%, 100% 100%, 100% 0, 0 0);
   cursor: pointer;
-  background-color: #333ce7;
   margin: 0px 15px;
   margin-left: 60px;
   transform: scale(0.9);
+  background-color: #2196f3;
 }
 .save:hover{
-  background-color: #000000;
+  background-color: #161d9b;
   transform: scale(1.1);
 }
 
@@ -272,7 +278,8 @@ a:hover{
     color: #3f2dff;
 }
 .footer-container {
-  padding: 20px 0px;
+  padding: 80px 0px;
+  border-top: 3px solid #2877fa;
   display: flex;
     flex-wrap: wrap;
     padding-bottom: 10px;
@@ -625,54 +632,6 @@ a:hover{
   width: 80%; 
   height: auto;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
