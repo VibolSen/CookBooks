@@ -11,15 +11,19 @@ export async function getUserById(userId: number) {
       .eq("user_id", userId)
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("Error fetching user data:", error.message);
+      throw new Error("Failed to fetch user data.");
+    }
+
     return data;
   } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw new Error("Failed to fetch user data.");
+    console.error("Error in getUserById:", error instanceof Error ? error.message : error);
+    throw new Error("An unexpected error occurred while fetching the user data.");
   }
 }
 
-// Update user by ID
+// Update user profile
 export async function updateUser(userId: number, userData: any) {
   try {
     const { user_name, email, about_me, image_url } = userData;
@@ -29,40 +33,51 @@ export async function updateUser(userId: number, userData: any) {
       return { success: false, error: "Name and email are required." };
     }
 
-    // Check if the email already exists for another user (skip if it belongs to the same user)
+    // Get the currently authenticated user
+    const currentUser = supabase.auth.user();
+
+    // If no user is authenticated, return an error
+    if (!currentUser) {
+      return { success: false, error: "You must be logged in to update your profile." };
+    }
+
+    // Check if the current user is trying to update their own profile
+    if (currentUser.id !== userId) {
+      return { success: false, error: "You can only edit your own profile." };
+    }
+
+    // Check if email already exists for another user (skip if it belongs to the same user)
     const { data: existingUserWithEmail, error: emailError } = await supabase
       .from("users")
       .select("*")
       .eq("email", email)
-      .neq("user_id", userId);
+      .neq("user_id", userId); // Ensure that the current user is excluded
 
-    if (emailError) throw emailError;
-    if (existingUserWithEmail.length > 0) {
-      return {
-        success: false,
-        error: "Email already exists. Please use a different email.",
-      };
+    if (emailError) {
+      console.error("Error checking email uniqueness:", emailError.message);
+      return { success: false, error: "Error checking email uniqueness." };
     }
 
-    // Update user data
+    // If the email already exists for another user, return an error
+    if (existingUserWithEmail && existingUserWithEmail.length > 0) {
+      return { success: false, error: "Email already exists. Please use a different email." };
+    }
+
+    // Proceed to update user data in Supabase
     const { error } = await supabase
       .from("users")
       .update({ user_name, email, about_me, image_url })
       .eq("user_id", userId);
 
-    if (error) throw error;
-    return { success: true, message: "Profile updated successfully!" };
-  } catch (error) {
-    console.error("Error updating user data:", error);
-
-    // Handle network errors
-    if (error instanceof Error && error.message === "Network Error") {
-      return {
-        success: false,
-        error: "Network error. Please try again later.",
-      };
+    if (error) {
+      console.error("Error updating user data:", error.message);
+      return { success: false, error: "Failed to update user data." };
     }
 
-    return { success: false, error: "Failed to update user data." };
+    console.log("User updated successfully!");
+    return { success: true, message: "Profile updated successfully!" };
+  } catch (err) {
+    console.error("Error in updateUser:", err instanceof Error ? err.message : err);
+    return { success: false, error: "An unexpected error occurred while updating the profile." };
   }
 }

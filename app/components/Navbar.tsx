@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { getUserById } from "@/app/actions/userActions"; // Assuming you have this function to get user data
-import { logout } from "@/app/actions/actions"; // Import logout function
 import Link from "next/link";
 
 interface NavbarProps {
@@ -32,11 +31,7 @@ export default function Navbar({ user }: NavbarProps) {
     }
   }, [isLoggedIn, user]); // Dependency array, re-run when 'user' or 'isLoggedIn' changes
 
-  const handleLogout = async (event: React.FormEvent) => {
-    event.preventDefault(); // Prevent default form submission
-    await logout(); // Call the logout function
-    // Optionally, handle additional logic after logout, like redirecting or updating the UI
-  };
+
 
   return (
     <div className="div">
@@ -54,7 +49,7 @@ export default function Navbar({ user }: NavbarProps) {
             </div>
             <div className="hidden md:flex space-x-10 text-lg">
               <Link
-                href="/"
+                href="/user/home"
                 className="text-gray-600 hover:text-blue-600 font-medium"
               >
                 Home
@@ -66,7 +61,7 @@ export default function Navbar({ user }: NavbarProps) {
                 Recipe
               </Link>
               <Link
-                href="/about-us"
+                href="/user/about-us"
                 className="text-gray-600 hover:text-blue-600 font-medium"
               >
                 About Us
@@ -95,22 +90,14 @@ export default function Navbar({ user }: NavbarProps) {
                       </span>
                     </Link>
                     {/* Profile link */}
-                    <Link href="/profile">
+                    <Link href="/profile/profileUser">
                       <img
                         src={imageUrl || "/default-avatar.png"} // Use the imageUrl state here
                         alt="Profile"
                         className="w-10 h-10 rounded-full border border-gray-300"
                       />
                     </Link>
-                    {/* Logout form */}
-                    <form onSubmit={handleLogout}>
-                      <button
-                        type="submit"
-                        className="bg-red-500 text-white px-4 py-2 rounded-full text-sm hover:bg-red-600 transition"
-                      >
-                        Logout
-                      </button>
-                    </form>
+
                   </>
                 ) : (
                   <Link

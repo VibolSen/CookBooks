@@ -54,7 +54,7 @@ export async function login(formData: FormData) {
     return {
       ok: true,
       success: true,
-      redirect: user.role === "Admin" ? "/dashboard" : "/",
+      redirect: user.role === "Admin" ? "/admin/dashboard" : "/user/home",
     };
   } catch (error) {
     console.error("❌ Login error:", error);
@@ -130,13 +130,15 @@ export async function register(formData: FormData) {
   }
 }
 
-// 🟢 LOGOUT FUNCTION
+
 export async function logout() {
-  const user = (await cookies()).get("user");
+  const cookieStore = cookies();
+  const user = cookieStore.get("user");
+
   if (!user) {
-    return redirect("/");
+    return redirect("/login"); // 🔄 Redirect if already logged out
   }
 
-  (await cookies()).delete("user");
-  return redirect("/");
+  cookieStore.delete("user"); // ❌ Remove the cookie
+  return redirect("/"); // 🔄 Redirect to login page
 }
