@@ -9,10 +9,10 @@ const Footer: React.FC = () => {
         <div className="footer-menu flex flex-col items-start">
           <ul className="flex list-none text-base text-ml">
             <li className="px-6">
-              <Link href="#" className="hover:text-blue-600">ABOUT US</Link>
+              <Link href="/user/about-us" className="hover:text-blue-600">ABOUT US</Link>
             </li>
             <li className="px-6">
-              <Link href="/contact-us" className="hover:text-blue-600">CONTACT US</Link>
+              <Link href="/user/contact-us" className="hover:text-blue-600">CONTACT US</Link>
             </li>
             <li className="px-6">
               <Link href="/faq" className="hover:text-blue-600">FAQ</Link>

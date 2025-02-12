@@ -27,7 +27,7 @@ export default function NotFoundPage() {
           The page you're looking for doesn't exist or has been moved.
         </p>
         <button
-          onClick={() => router.push("/")}
+          onClick={() => router.push("/user/home")}
           className="mt-6 px-6 py-3 border border-blue-600 text-blue-600 text-lg font-semibold rounded-lg shadow-md hover:border-blue-700 hover:bg-blue-50 transition-all duration-300"
         >
           Back to Home
