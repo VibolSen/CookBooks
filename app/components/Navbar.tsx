@@ -55,7 +55,7 @@ export default function Navbar({ user }: NavbarProps) {
                 Home
               </Link>
               <Link
-                href="/recipe"
+                href="/user/recipe"
                 className="text-gray-600 hover:text-blue-600 font-medium"
               >
                 Recipe
