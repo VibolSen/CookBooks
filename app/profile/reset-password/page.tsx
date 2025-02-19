@@ -1,24 +1,27 @@
-'use client'
+"use client"
 
-import { useState } from 'react';
-import Link from 'next/link';
-import SidebarNav from '@/app/components/Sidebar';
+import { useState } from "react";
+import Link from "next/link";
+import SidebarNav from "@/app/components/Sidebar";
+import { resetPassword, changePassword } from "@/app/actions/userActions";  // Import your functions
 
 export default function ResetPassword() {
-  const [email, setEmail] = useState('');
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setSuccess(false);
 
-    if (!email.includes('@')) {
-      setError('Please enter a valid email address.');
+    // Input validations
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -28,17 +31,23 @@ export default function ResetPassword() {
     }
 
     if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters long.');
+      setError("Password must be at least 6 characters long.");
       return;
     }
 
     try {
-      // Mock API call to reset password
-      // Replace this with an actual API call to your backend
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSuccess(true);
+      setIsResetting(true);
+      // Send reset password email
+      const result = await resetPassword(email);
+      if (result.success) {
+        setSuccess(true);
+      } else {
+        setError(result.error);
+      }
     } catch (error) {
-      setError('Failed to reset password. Please try again.');
+      setError("Failed to reset password. Please try again.");
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -46,9 +55,7 @@ export default function ResetPassword() {
     <div className="container mx-auto px-10 py-10">
       <h1 className="text-3xl font-bold mb-6 ml-[100px]">Reset Password</h1>
       <div className="flex justify-center space-x-8">
-
-<SidebarNav />
-
+        <SidebarNav />
         {/* Reset Password Form */}
         <div className="w-3/4 bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-semibold mb-4">Reset Your Password</h2>
@@ -60,7 +67,7 @@ export default function ResetPassword() {
             )}
             {success && (
               <div className="bg-green-100 text-green-600 p-4 rounded-md">
-                <p>Password reset successfully!</p>
+                <p>Password reset email sent successfully!</p>
               </div>
             )}
 
@@ -112,9 +119,10 @@ export default function ResetPassword() {
             <div className="flex justify-end">
               <button
                 type="submit"
+                disabled={isResetting}
                 className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
               >
-                Reset Password
+                {isResetting ? "Resetting..." : "Reset Password"}
               </button>
             </div>
           </form>
@@ -123,3 +131,4 @@ export default function ResetPassword() {
     </div>
   );
 }
+

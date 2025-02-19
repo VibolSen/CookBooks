@@ -120,8 +120,8 @@ export default function UserManagement() {
               {users.length > 0 ? (
                 users.map((user) => (
                   <tr key={user.id} className="border-b hover:bg-gray-100">
-                    <td className="py-3 px-6 text-left">{user.id}</td>
-                    <td className="py-3 px-6 text-left">{user.name}</td>
+                    <td className="py-3 px-6 text-left">{user.user_id}</td>
+                    <td className="py-3 px-6 text-left">{user.user_name}</td>
                     <td className="py-3 px-6 text-left">{user.email}</td>
                     <td className="py-3 px-6 text-left">
                       {user.is_admin ? "Admin" : "User"}

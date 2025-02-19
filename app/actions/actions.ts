@@ -132,13 +132,15 @@ export async function register(formData: FormData) {
 
 
 export async function logout() {
-  const cookieStore = cookies();
-  const user = cookieStore.get("user");
+  "use server"; // Ensures this runs on the server
+
+  const cookieStore = await cookies(); // Await the cookie store
+  const user = cookieStore.get("user"); // Now we can safely get the user cookie
 
   if (!user) {
-    return redirect("/login"); // 🔄 Redirect if already logged out
+    return redirect("/login"); // Redirect if no user is logged in
   }
 
-  cookieStore.delete("user"); // ❌ Remove the cookie
-  return redirect("/"); // 🔄 Redirect to login page
+  await cookieStore.delete("user"); // Await deletion of the cookie
+  return redirect("/"); // Redirect the user to the homepage
 }

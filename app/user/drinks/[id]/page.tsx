@@ -1,11 +1,10 @@
+// app/drinks/[id]/page.tsx
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { getDrinkRecipeById } from '@/app/actions/drinkActions';
 import { useParams } from 'next/navigation';
 import { FaStar } from 'react-icons/fa';
-import Navbar from '@/app/components/Navbar';
-import Footer from '@/app/components/Footer';
 
 interface Recipe {
   recipe_id: number;
@@ -20,40 +19,46 @@ interface Recipe {
   date: string;
 }
 
-const DrinkPage: React.FC = () => {
-  const { id: recipeId } = useParams();
+interface DrinkPageProps {
+  recipeId: string; // `recipeId` is a string from the URL
+  user: User | null; // `user` object passed from server
+}
+
+const DrinkPage: React.FC<DrinkPageProps> = ({ recipeId, user }) => {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [error, setError] = useState<string | null>(null); // State for error handling
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDrinkRecipe = async () => {
       try {
-        const data = await getDrinkRecipeById(Number(recipeId)); // Convert to number if needed
+        if (!recipeId) {
+          setError('Invalid recipe ID');
+          return;
+        }
+
+        // Pass recipeId as a number to the function
+        const data = await getDrinkRecipeById(Number(recipeId));
         setRecipe(data);
       } catch (error) {
         console.error('Error fetching drink recipe:', error);
-        setError('Failed to load recipe.'); // Set error message
+        setError('Failed to load recipe.');
       }
     };
 
-    if (recipeId) {
-      fetchDrinkRecipe();
-    }
+    fetchDrinkRecipe();
   }, [recipeId]);
 
   if (error) {
-    return <p>{error}</p>; // Show error message if there's an error
+    return <p className="text-red-500">{error}</p>;
   }
 
   if (!recipe) {
-    return <p>Loading...</p>;
+    return <p className="text-gray-600">Loading...</p>;
   }
 
   return (
     <div>
-      <Navbar user={null} /> {/* Pass user prop if available */}
       <div className="p-8 bg-gray-100 min-h-screen">
-        {/* Header Section */}
         <div className="text-center mb-6">
           <h1 className="text-4xl font-bold">{recipe.recipe_name}</h1>
           <div className="flex justify-center items-center mt-2">
@@ -79,7 +84,6 @@ const DrinkPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Image Section */}
         <div className="flex justify-center mb-8">
           <img
             className="w-full max-w-xl h-auto rounded-lg shadow-lg"
@@ -88,7 +92,6 @@ const DrinkPage: React.FC = () => {
           />
         </div>
 
-        {/* Overview Section */}
         <div className="bg-white shadow-md rounded-lg p-6">
           <h2 className="text-2xl font-semibold mb-4">Overview</h2>
           <p className="text-gray-700 mb-4">{recipe.description}</p>
@@ -110,7 +113,6 @@ const DrinkPage: React.FC = () => {
           </ul>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

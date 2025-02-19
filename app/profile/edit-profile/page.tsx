@@ -17,7 +17,7 @@ const EditProfile = () => {
   const imageUrlRef = useRef<HTMLInputElement>(null);
 
   // Get user ID from the current session or pass it from props
-  const userId = 1; // Replace this with actual logged-in user ID from session/authentication
+  const userId = 7; // Replace this with actual logged-in user ID from session/authentication
 
   useEffect(() => {
     // Fetch the user data when the component mounts
