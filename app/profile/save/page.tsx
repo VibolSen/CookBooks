@@ -1,7 +1,10 @@
-'use client'
+// src/app/pages/save-page.tsx
+
+"use client"
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import SidebarNav from '@/app/components/Sidebar';
+import { supabase } from '@/app/lib/db';
 
 export default function SavePage() {
   const [savedItems, setSavedItems] = useState<any[]>([]); // Adjust type as per your API response
@@ -10,16 +13,27 @@ export default function SavePage() {
   const [filteredItems, setFilteredItems] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch saved items
+    // Fetch saved items from Supabase
     const fetchSavedItems = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/saved'); // Replace with your API endpoint
-        const data = await response.json();
+        const { data, error } = await supabase
+          .from('saved_recipe') // Ensure this is the correct table name
+          .select('*'); // Adjust column names as needed
+
+        if (error) {
+          console.error('Error fetching saved items:', error.message); // Log the actual error message
+          throw new Error(error.message);
+        }
+
+        if (!data || data.length === 0) {
+          console.log('No saved items found.');
+        }
+
         setSavedItems(data);
         setFilteredItems(data);
       } catch (error) {
-        console.error("Error fetching saved items:", error);
+        console.error("Error fetching saved items:", error); // Enhanced error logging
       } finally {
         setLoading(false);
       }
@@ -40,10 +54,19 @@ export default function SavePage() {
   // Remove an item
   const handleRemove = async (id: string) => {
     try {
-      await fetch(`/api/saved/${id}`, { method: 'DELETE' }); // Replace with your API endpoint
+      const { error } = await supabase
+        .from('saved_recipe') // Your table name
+        .delete()
+        .eq('id', id); // Adjust if your column name differs
+
+      if (error) {
+        console.error('Error removing item:', error.message);
+        throw new Error(error.message);
+      }
+
       setSavedItems(savedItems.filter((item) => item.id !== id));
     } catch (error) {
-      console.error("Error removing item:", error);
+      console.error('Error removing item:', error);
     }
   };
 
@@ -51,8 +74,7 @@ export default function SavePage() {
     <div className="container mx-auto px-10 py-10">
       <h1 className="text-3xl font-bold mb-6 ml-[100px]">Saved Items</h1>
       <div className="flex flex-col lg:flex-row justify-center space-x-8">
- 
- <SidebarNav />
+        <SidebarNav />
 
         {/* Saved Items List */}
         <div className="w-full lg:w-3/4 bg-white rounded-lg shadow-lg p-6">

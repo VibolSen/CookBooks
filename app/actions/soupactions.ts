@@ -13,7 +13,7 @@ interface Recipe {
   date: string;
 }
 
-export async function getDrinkRecipeById(recipeId: number): Promise<Recipe | null> {
+export async function getSoupRecipeById(recipeId: number): Promise<Recipe | null> {
   try {
     const { data, error } = await supabase
       .from("recipe")
@@ -41,12 +41,12 @@ export async function getDrinkRecipeById(recipeId: number): Promise<Recipe | nul
 
 
 // Fetch all drink recipes
-export async function getDrinkRecipes(): Promise<Recipe[]> {
+export async function getSoupRecipes(): Promise<Recipe[]> {
   try {
     const { data, error } = await supabase
       .from("recipe")
       .select("*")
-      .eq("category_id", 4); // Filter by category (e.g., drinks)
+      .eq("category_id", 2); // Filter by category (e.g., drinks)
 
     if (error) {
       console.error("Error fetching drink recipes:", error.message);

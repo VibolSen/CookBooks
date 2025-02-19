@@ -1,8 +1,13 @@
 "use server";
 
-import { supabase } from "@/app/lib/db";
+import { createClient } from "@supabase/supabase-js";
 
-// Fetch user by ID
+// Initialize Supabase Client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Fetch User by ID
 export async function getUserById(userId: number) {
   try {
     const { data, error } = await supabase
@@ -23,47 +28,48 @@ export async function getUserById(userId: number) {
   }
 }
 
-// Update user profile
-export async function updateUser(userId: number, userData: any) {
+export async function updateUser(
+  userId: string, // Supabase uses UUID for user IDs
+  userData: { user_name: string; email: string; about_me?: string; image_url?: string }
+) {
   try {
     const { user_name, email, about_me, image_url } = userData;
 
-    // Validate required fields
+    // Validate input
     if (!user_name || !email) {
       return { success: false, error: "Name and email are required." };
     }
 
-    // Get the currently authenticated user
-    const currentUser = supabase.auth.user();
-
-    // If no user is authenticated, return an error
-    if (!currentUser) {
+    // Ensure the user is logged in
+    const { data: authData, error: authError } = await supabase.auth.getUser();
+    if (authError || !authData?.user) {
       return { success: false, error: "You must be logged in to update your profile." };
     }
 
-    // Check if the current user is trying to update their own profile
-    if (currentUser.id !== userId) {
+    const currentUserId = authData.user.id; // Supabase Auth user ID (UUID)
+
+    if (currentUserId !== userId) {
       return { success: false, error: "You can only edit your own profile." };
     }
 
-    // Check if email already exists for another user (skip if it belongs to the same user)
-    const { data: existingUserWithEmail, error: emailError } = await supabase
+    // Check if the email already exists for another user
+    const { data: existingUser, error: emailCheckError } = await supabase
       .from("users")
-      .select("*")
+      .select("user_id")
       .eq("email", email)
-      .neq("user_id", userId); // Ensure that the current user is excluded
+      .neq("user_id", userId) // Exclude the current user
+      .single();
 
-    if (emailError) {
-      console.error("Error checking email uniqueness:", emailError.message);
+    if (emailCheckError) {
+      console.error("Error checking email uniqueness:", emailCheckError.message);
       return { success: false, error: "Error checking email uniqueness." };
     }
 
-    // If the email already exists for another user, return an error
-    if (existingUserWithEmail && existingUserWithEmail.length > 0) {
+    if (existingUser) {
       return { success: false, error: "Email already exists. Please use a different email." };
     }
 
-    // Proceed to update user data in Supabase
+    // Update user data in Supabase
     const { error } = await supabase
       .from("users")
       .update({ user_name, email, about_me, image_url })
@@ -74,10 +80,65 @@ export async function updateUser(userId: number, userData: any) {
       return { success: false, error: "Failed to update user data." };
     }
 
-    console.log("User updated successfully!");
     return { success: true, message: "Profile updated successfully!" };
   } catch (err) {
     console.error("Error in updateUser:", err instanceof Error ? err.message : err);
     return { success: false, error: "An unexpected error occurred while updating the profile." };
   }
 }
+
+// Fetch Recipes
+export const fetchRecipes = async () => {
+  try {
+    const { data, error } = await supabase.from("recipe").select("*");
+    if (error) {
+      console.error("Error fetching recipes:", error.message);
+      throw new Error("Failed to fetch recipes.");
+    }
+    return data;
+  } catch (error) {
+    console.error("Error in fetchRecipes:", error instanceof Error ? error.message : error);
+    return [];
+  }
+};
+
+// Delete Recipe
+export const deleteRecipe = async (id: number) => {
+  try {
+    if (!id) throw new Error("Invalid recipe ID");
+
+    const { error } = await supabase.from("recipe").delete().eq("recipe_id", id);
+    if (error) {
+      console.error("Error deleting recipe:", error.message);
+      throw new Error("Failed to delete recipe.");
+    }
+    return true;
+  } catch (error) {
+    console.error("Error in deleteRecipe:", error instanceof Error ? error.message : error);
+    return false;
+  }
+};
+
+
+export const resetPassword = async (email: string) => {
+  try {
+    if (!email || !email.includes('@')) {
+      return { success: false, error: "Please provide a valid email." };
+    }
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'http://localhost:3000/reset-password', // Replace with your actual redirect URL
+    });
+
+    if (error) {
+      console.error("Error sending reset password email:", error.message);
+      return { success: false, error: "Failed to send password reset email." };
+    }
+
+    return { success: true, message: "Password reset email sent successfully!" };
+  } catch (error) {
+    console.error("Error in resetPassword:", error instanceof Error ? error.message : error);
+    return { success: false, error: "An unexpected error occurred while sending the reset password email." };
+  }
+};
+

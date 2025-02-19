@@ -11,7 +11,7 @@ interface RecipeData {
   ingredients: string;
 }
 
-const DrinksCard: React.FC<RecipeData> = ({ 
+const SoupCard: React.FC<RecipeData> = ({ 
   recipe_id, 
   recipe_name, 
   cook_time, 
@@ -66,7 +66,7 @@ const DrinksCard: React.FC<RecipeData> = ({
 
         {/* View Recipe Button */}
         <Link
-          href={`/user/drinks/${recipe_id}`} // Fixed path
+          href={`/user/soup/${recipe_id}`} // Fixed path
           className="mt-4 block text-center bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-300"
         >
           View Recipe
@@ -76,4 +76,4 @@ const DrinksCard: React.FC<RecipeData> = ({
   );
 };
 
-export default DrinksCard;
+export default SoupCard;

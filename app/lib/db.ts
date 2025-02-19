@@ -1,28 +1,35 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('SUPABASE_URL and SUPABASE_KEY must be set');
+  throw new Error("❌ ERROR: Supabase URL and Key must be set in environment variables.");
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: true, // 🔹 Ensures session persistence across page reloads
+    autoRefreshToken: true, // 🔹 Refreshes the session automatically when needed
+    detectSessionInUrl: true, // 🔹 Detects OAuth sign-in sessions
+  },
+});
 
-// Test the connection to Supabase
+// ✅ Test Supabase Connection
 async function testConnection() {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .limit(1);
-  if (error) {
-    console.error("Connection test failed:", error);
-  } else {
-    console.log("Connection test succeeded:", data);
+  try {
+    const { data, error } = await supabase.from("users").select("*").limit(1);
+    if (error) {
+      console.error("❌ Connection test failed:", error);
+    } else {
+      console.log("✅ Supabase Connection Successful:", data);
+    }
+  } catch (err) {
+    console.error("❌ Unexpected error while testing connection:", err);
   }
 }
 
-// Call the test function
-testConnection();
-
-export { supabase };
+// Call the test function only in development
+if (process.env.NODE_ENV === "development") {
+  testConnection();
+}

@@ -55,9 +55,17 @@ export default function RecipeManagement() {
           <ul className="space-y-4">
             {[
               { href: "/", label: "Home", icon: "home" },
-              { href: "/admin/dashboard", label: "Dashboard", icon: "dashboard" },
+              {
+                href: "/admin/dashboard",
+                label: "Dashboard",
+                icon: "dashboard",
+              },
               { href: "/admin/users", label: "Users", icon: "people" },
-              { href: "/admin/recipes", label: "Recipes", icon: "restaurant_menu" },
+              {
+                href: "/admin/recipes",
+                label: "Recipes",
+                icon: "restaurant_menu",
+              },
               { href: "/admin/events", label: "Events", icon: "event" },
             ].map(({ href, label, icon }) => (
               <li key={href}>
@@ -95,7 +103,8 @@ export default function RecipeManagement() {
               height={40}
               className="rounded-full"
             />
-            <span className="font-medium">{user.name}</span> {/* User info */}
+            <span className="font-medium">{user.user_name}</span>{" "}
+            {/* User info */}
           </div>
         </header>
 
@@ -119,16 +128,16 @@ export default function RecipeManagement() {
                 >
                   <Image
                     src={category.image}
-                    alt={category.name}
+                    alt={category.category_name}
                     width={80}
                     height={80}
                     className="w-20 h-20 mx-auto mb-4"
                   />
                   <h3 className="text-lg font-semibold text-center mb-2">
-                    {category.name}
+                    {category.category_name}
                   </h3>
                   <Link
-                    href={`/recipes/category/${category.id}`}
+                    href={`/recipes/category/${category.category_id}`}
                     className="bg-orange-500 text-white px-4 py-2 rounded-lg block mx-auto text-center"
                   >
                     View
@@ -152,7 +161,7 @@ export default function RecipeManagement() {
             <div className="grid grid-cols-4 gap-6">
               {occasions.map((occasion) => (
                 <div
-                  key={occasion.id}
+                  key={occasion.occasion_id}
                   className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition"
                 >
                   <Image
@@ -166,7 +175,7 @@ export default function RecipeManagement() {
                     {occasion.name}
                   </h3>
                   <Link
-                    href={`/recipes/occasion/${occasion.id}`}
+                    href={`/recipes/occasion/${occasion.occasion_id}`}
                     className="bg-orange-500 text-white px-4 py-2 rounded-lg block mx-auto text-center"
                   >
                     View

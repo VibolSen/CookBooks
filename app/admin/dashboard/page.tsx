@@ -9,7 +9,7 @@ async function getDashboardStats() {
   try {
     const [{ count: userCount }, { count: recipeCount }, { count: eventCount }, { count: categoryCount }] = await Promise.all([
       supabase.from('users').select('*', { count: 'exact' }),
-      supabase.from('recipes').select('*', { count: 'exact' }),
+      supabase.from('recipe').select('*', { count: 'exact' }),
       supabase.from('events').select('*', { count: 'exact' }),
       supabase.from('categories').select('*', { count: 'exact' }),
     ]);

@@ -5,7 +5,7 @@ import { getUserById } from "@/app/actions/userActions"; // Assuming you have th
 import Link from "next/link";
 
 interface NavbarProps {
-  user: { id: string; image_url?: string } | null;
+  user: { user_id: string; image_url?: string } | null;
 }
 
 export default function Navbar({ user }: NavbarProps) {
@@ -15,9 +15,9 @@ export default function Navbar({ user }: NavbarProps) {
   useEffect(() => {
     // Fetch user data (including image_url) if the user is logged in
     const fetchUserData = async () => {
-      if (user && user.id) {
+      if (user && user.user_id) {
         try {
-          const userData = await getUserById(Number(user.id)); // Fetch user data
+          const userData = await getUserById(Number(user.user_id)); // Fetch user data
           setImageUrl(userData?.image_url || "/default-avatar.png"); // Update imageUrl state
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -127,7 +127,7 @@ export default function Navbar({ user }: NavbarProps) {
             Popular
           </Link>
           <Link
-            href="/soup"
+            href="/user/soup"
             className="text-gray-600 hover:text-blue-600 font-medium"
           >
             Soup
@@ -145,7 +145,7 @@ export default function Navbar({ user }: NavbarProps) {
             Occasions
           </Link>
           <Link
-            href="/drinks"
+            href="/user/drinks"
             className="text-gray-600 hover:text-blue-600 font-medium"
           >
             Drinks
