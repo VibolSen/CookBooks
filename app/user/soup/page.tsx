@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import SoupPageClient from "@/app/components/SoupPage"; // Import the Client Component
-import { getSoupRecipes } from "@/app/actions/soupactions";
+import { getSoupRecipes } from "@/app/actions/recipeActions";
 
 export default async function SoupPage() {
   // Await the cookies() function

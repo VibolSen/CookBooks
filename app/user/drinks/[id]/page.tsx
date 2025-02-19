@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getDrinkRecipeById } from '@/app/actions/drinkActions';
+import { getRecipeById } from '@/app/actions/recipeActions';
 import { useParams } from 'next/navigation';
 import { FaStar } from 'react-icons/fa';
 
@@ -19,17 +19,13 @@ interface Recipe {
   date: string;
 }
 
-interface DrinkPageProps {
-  recipeId: string; // `recipeId` is a string from the URL
-  user: User | null; // `user` object passed from server
-}
-
-const DrinkPage: React.FC<DrinkPageProps> = ({ recipeId, user }) => {
+const DrinksPage: React.FC = () => {
+  const { id: recipeId } = useParams();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchDrinkRecipe = async () => {
+    const fetchDrinksRecipe = async () => {
       try {
         if (!recipeId) {
           setError('Invalid recipe ID');
@@ -37,15 +33,15 @@ const DrinkPage: React.FC<DrinkPageProps> = ({ recipeId, user }) => {
         }
 
         // Pass recipeId as a number to the function
-        const data = await getDrinkRecipeById(Number(recipeId));
+        const data = await getRecipeById(Number(recipeId));
         setRecipe(data);
       } catch (error) {
-        console.error('Error fetching drink recipe:', error);
+        console.error('Error fetching soup recipe:', error);
         setError('Failed to load recipe.');
       }
     };
 
-    fetchDrinkRecipe();
+    fetchDrinksRecipe();
   }, [recipeId]);
 
   if (error) {
@@ -117,4 +113,4 @@ const DrinkPage: React.FC<DrinkPageProps> = ({ recipeId, user }) => {
   );
 };
 
-export default DrinkPage;
+export default DrinksPage;

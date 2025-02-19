@@ -124,7 +124,7 @@ export default function UserManagement() {
                     <td className="py-3 px-6 text-left">{user.user_name}</td>
                     <td className="py-3 px-6 text-left">{user.email}</td>
                     <td className="py-3 px-6 text-left">
-                      {user.is_admin ? "Admin" : "User"}
+                      {user. is_admin  ? "Admin" : "User"}
                     </td>
                     <td className="py-3 px-6 text-left">
                       {new Date(user.created_at).toLocaleDateString()}
@@ -142,14 +142,14 @@ export default function UserManagement() {
                     </td>
                     <td className="py-3 px-6 text-left">
                       <Link
-                        href={`/admin/users/edit?id=${user.id}`}
+                        href={`/admin/user/edit?id=${user.user_id}`}
                         className="text-blue-600 hover:underline"
                       >
                         Edit
                       </Link>
                       <span className="mx-2">|</span>
                       <button
-                        onClick={() => handleDelete(user.id)}
+                        onClick={() => handleDelete(user.user_id)}
                         className="text-red-600 hover:underline"
                       >
                         Delete

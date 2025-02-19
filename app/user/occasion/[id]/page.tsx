@@ -19,13 +19,13 @@ interface Recipe {
   date: string;
 }
 
-const SoupPage: React.FC = () => {
+const OccasionPage: React.FC = () => {
   const { id: recipeId } = useParams();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSoupRecipe = async () => {
+    const fetchOccasionRecipe = async () => {
       try {
         if (!recipeId) {
           setError('Invalid recipe ID');
@@ -36,12 +36,12 @@ const SoupPage: React.FC = () => {
         const data = await getRecipeById(Number(recipeId));
         setRecipe(data);
       } catch (error) {
-        console.error('Error fetching soup recipe:', error);
+        console.error('Error fetching occasion recipe:', error);
         setError('Failed to load recipe.');
       }
     };
 
-    fetchSoupRecipe();
+    fetchOccasionRecipe();
   }, [recipeId]);
 
   if (error) {
@@ -113,4 +113,4 @@ const SoupPage: React.FC = () => {
   );
 };
 
-export default SoupPage;
+export default OccasionPage;

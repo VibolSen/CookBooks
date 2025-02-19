@@ -1,8 +1,7 @@
-'use client'; // Mark this as a Client Component
+"use client"; // Mark this as a Client Component
 
-import React from 'react';
-import DrinksCard from '@/app/components/card/DrinksCard';
-
+import React from "react";
+import Drinks from "@/app/components/card/Drinks";
 
 interface Recipe {
   recipe_id: number;
@@ -15,23 +14,21 @@ interface Recipe {
   ingredients: string;
 }
 
-interface DrinksPageClientProps {
+interface SoupPageClientProps {
   user: any; // Replace `any` with your user type
   recipes: Recipe[];
 }
 
-const DrinksPageClient: React.FC<DrinksPageClientProps> = ({ user, recipes }) => {
+const DrinksPageClient: React.FC<SoupPageClientProps> = ({ user, recipes }) => {
   return (
     <div>
-\
-
       {/* Main content */}
       <div className="p-8">
         <h1 className="text-3xl font-bold mb-8 text-center">Drinks</h1>
         <div className="flex flex-wrap justify-center gap-6">
           {recipes.map((recipe) => (
             <div className="flex justify-center" key={recipe.recipe_id}>
-              <DrinksCard
+              <Drinks
                 recipe_id={recipe.recipe_id}
                 recipe_name={recipe.recipe_name}
                 cook_time={`${recipe.prep_time + recipe.cook_time} mins`}
@@ -44,8 +41,6 @@ const DrinksPageClient: React.FC<DrinksPageClientProps> = ({ user, recipes }) =>
           ))}
         </div>
       </div>
-
-
     </div>
   );
 };
