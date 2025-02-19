@@ -13,7 +13,9 @@ export default async function HomePage() {
     <div>
       <Navbar user={user} />
       {/* Other components go here */}
+      <div className="max-w-[1400px] m-auto">
       <BannerSwiper />
+      </div>
       <Footer />
     </div>
   );

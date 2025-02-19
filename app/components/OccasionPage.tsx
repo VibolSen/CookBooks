@@ -1,7 +1,7 @@
 "use client"; // Mark this as a Client Component
 
 import React from "react";
-import Soup from "@/app/components/card/Soup";
+import Occasion from "@/app/components/card/Occasion";
 
 interface Recipe {
   recipe_id: number;
@@ -14,21 +14,21 @@ interface Recipe {
   ingredients: string;
 }
 
-interface SoupPageClientProps {
+interface OccasionPageClientProps {
   user: any; // Replace `any` with your user type
   recipes: Recipe[];
 }
 
-const SoupPageClient: React.FC<SoupPageClientProps> = ({ user, recipes }) => {
+const OcaasionPageClient: React.FC<OccasionPageClientProps> = ({ user, recipes }) => {
   return (
     <div>
       {/* Main content */}
       <div className="p-8">
-        <h1 className="text-3xl font-bold mb-8 text-center">Soup</h1>
+        <h1 className="text-3xl font-bold mb-8 text-center">Occasion</h1>
         <div className="flex flex-wrap justify-center gap-6">
           {recipes.map((recipe) => (
             <div className="flex justify-center" key={recipe.recipe_id}>
-              <Soup
+              <Occasion
                 recipe_id={recipe.recipe_id}
                 recipe_name={recipe.recipe_name}
                 cook_time={`${recipe.prep_time + recipe.cook_time} mins`}
@@ -45,4 +45,4 @@ const SoupPageClient: React.FC<SoupPageClientProps> = ({ user, recipes }) => {
   );
 };
 
-export default SoupPageClient;
+export default OcaasionPageClient;

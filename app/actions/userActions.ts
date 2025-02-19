@@ -7,26 +7,26 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Fetch User by ID
-export async function getUserById(userId: number) {
-  try {
-    const { data, error } = await supabase
-      .from("users")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
+export const getUserById = async (userId: number) => {
+  console.log("🔍 Fetching user ID:", userId);
 
-    if (error) {
-      console.error("Error fetching user data:", error.message);
-      throw new Error("Failed to fetch user data.");
-    }
+  const { data, error } = await supabase
+    .from("users")
+    .select("user_id, image_url")
+    .eq("user_id", userId)
+    .single();
 
-    return data;
-  } catch (error) {
-    console.error("Error in getUserById:", error instanceof Error ? error.message : error);
-    throw new Error("An unexpected error occurred while fetching the user data.");
+  if (error) {
+    console.error("❌ Supabase fetch error:", error.message);
+    return null;
   }
-}
+
+  console.log("✅ User fetched:", data);
+  return data;
+};
+
+
+
 
 export async function updateUser(
   userId: string, // Supabase uses UUID for user IDs
@@ -127,7 +127,7 @@ export const resetPassword = async (email: string) => {
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'http://localhost:3000/reset-password', // Replace with your actual redirect URL
+      redirectTo: 'http://localhost:3000/user/reset-password', // Replace with your actual redirect URL
     });
 
     if (error) {
