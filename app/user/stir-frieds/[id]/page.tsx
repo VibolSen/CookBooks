@@ -19,13 +19,13 @@ interface Recipe {
   date: string;
 }
 
-const DrinksPage: React.FC = () => {
+const FriedPage: React.FC = () => {
   const { id: recipeId } = useParams();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchDrinksRecipe = async () => {
+    const fetchFriedRecipe = async () => {
       try {
         if (!recipeId) {
           setError('Invalid recipe ID');
@@ -36,12 +36,12 @@ const DrinksPage: React.FC = () => {
         const data = await getRecipeById(Number(recipeId));
         setRecipe(data);
       } catch (error) {
-        console.error('Error fetching drink recipe:', error);
+        console.error('Error fetching soup recipe:', error);
         setError('Failed to load recipe.');
       }
     };
 
-    fetchDrinksRecipe();
+    fetchFriedRecipe();
   }, [recipeId]);
 
   if (error) {
@@ -113,4 +113,4 @@ const DrinksPage: React.FC = () => {
   );
 };
 
-export default DrinksPage;
+export default FriedPage;

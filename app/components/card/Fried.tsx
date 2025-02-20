@@ -11,7 +11,7 @@ interface RecipeData {
   ingredients: string;
 }
 
-const Stir_fried: React.FC<RecipeData> = ({ 
+const Fried: React.FC<RecipeData> = ({ 
   recipe_id, 
   recipe_name, 
   cook_time, 
@@ -66,7 +66,7 @@ const Stir_fried: React.FC<RecipeData> = ({
 
         {/* View Recipe Button */}
         <Link
-          href={`/user/stir_fried/${recipe_id}`} // Fixed path
+          href={`/user/stir-frieds/${recipe_id}`} // Fixed path
           className="mt-4 block text-center bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-300"
         >
           View Recipe
@@ -76,4 +76,4 @@ const Stir_fried: React.FC<RecipeData> = ({
   );
 };
 
-export default Stir_fried;
+export default Fried;

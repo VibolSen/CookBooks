@@ -13,53 +13,54 @@ interface Recipe {
   date: string;
 }
 
-
 export async function getRecipeById(recipeId: number): Promise<Recipe | null> {
-    try {
-      const { data, error } = await supabase
-        .from("recipe")
-        .select("*")
-        .eq("recipe_id", recipeId) // Use recipe_id from database
-        .single(); // Fetch a single record
-  
-      if (error) {
-        console.error("Error fetching soup recipe:", error.message);
-        return null;
-      }
-  
-      if (!data) {
-        console.log("No recipe found for the ID:", recipeId);
-        return null;
-      }
-  
-      return data;
-    } catch (error) {
-      console.error("Error fetching soup recipe:", error);
+  try {
+    const { data, error } = await supabase
+      .from("recipe")
+      .select("*, image_recipe(image_url)")
+      .eq("recipe_id", recipeId)
+      .single(); // Ensures only one recipe is returned
+
+    if (error) throw error;
+
+    if (!data) {
+      console.warn("No recipe found for the ID:", recipeId);
       return null;
     }
+
+    return {
+      ...data,
+      image_url: data.image_recipe?.[0]?.image_url || " " // Handle array response
+    };
+  } catch (error) {
+    console.error("Error fetching recipe:", error);
+    return null;
   }
+}
 
 
-  
 // Fetch all drink recipes
 export async function getDrinkRecipes(): Promise<Recipe[]> {
-    try {
-      const { data, error } = await supabase
-        .from("recipe")
-        .select("*")
-        .eq("category_id", 4); // Filter by category (e.g., drinks)
-  
-      if (error) {
-        console.error("Error fetching drink recipes:", error.message);
-        throw new Error("Failed to fetch drink recipes");
-      }
-  
-      return data as Recipe[];
-    } catch (error) {
-      console.error("Error fetching drink recipes:", error);
-      throw new Error("Failed to fetch drink recipes");
-    }
+  try {
+    const { data, error } = await supabase
+      .from("recipe")
+      .select("*, image_recipe(image_url)") // Ensure image_url is selected
+      .eq("category_id", 4); // Filter for drinks
+
+    if (error) throw error;
+
+    console.log("Fetched recipes:", data); // Debugging: Check the response
+
+    return data.map((recipe: any) => ({
+      ...recipe,
+      image_url: recipe.image_recipe?.[0]?.image_url ?? " "
+    })) as Recipe[];
+  } catch (error) {
+    console.error("Error fetching drink recipes:", error);
+    return [];
   }
+}
+
 
 
 // Fetch all soup recipes
@@ -67,18 +68,20 @@ export async function getSoupRecipes(): Promise<Recipe[]> {
   try {
     const { data, error } = await supabase
       .from("recipe")
-      .select("*")
-      .eq("category_id", 2); // Filter by category (e.g., soups)
+      .select("*, image_recipe(image_url)") // Ensure images are included
+      .eq("category_id", 2); // Filter for soups
 
-    if (error) {
-      console.error("Error fetching soup recipes:", error.message);
-      throw new Error("Failed to fetch soup recipes");
-    }
+    if (error) throw error;
 
-    return data as Recipe[];
+    console.log("Fetched soup recipes:", data); // Debugging: Check the response
+
+    return data.map((recipe: any) => ({
+      ...recipe,
+      image_url: recipe.image_recipe?.[0]?.image_url || " " // Handle possible array response
+    })) as Recipe[];
   } catch (error) {
     console.error("Error fetching soup recipes:", error);
-    throw new Error("Failed to fetch soup recipes");
+    return [];
   }
 }
 
@@ -88,17 +91,67 @@ export async function getOccasionRecipes(): Promise<Recipe[]> {
   try {
     const { data, error } = await supabase
       .from("recipe")
-      .select("*")
-      .eq("category_id", 1); // Filter by category (e.g., drinks)
+      .select("*, image_recipe(image_url)") // Include image data
+      .eq("category_id", 1); // Filter for occasion recipes
 
-    if (error) {
-      console.error("Error fetching drink recipes:", error.message);
-      throw new Error("Failed to fetch drink recipes");
-    }
+    if (error) throw error;
 
-    return data as Recipe[];
+    console.log("Fetched occasion recipes:", data); // Debugging
+
+    return data.map((recipe: any) => ({
+      ...recipe,
+      image_url: recipe.image_recipe?.[0]?.image_url || " " // Handle missing images
+    })) as Recipe[];
   } catch (error) {
-    console.error("Error fetching drink recipes:", error);
-    throw new Error("Failed to fetch drink recipes");
+    console.error("Error fetching occasion recipes:", error);
+    return [];
+  }
+}
+
+
+
+// Fetch all  Dessert
+export async function getDessertRecipes(): Promise<Recipe[]> {
+  try {
+    const { data, error } = await supabase
+      .from("recipe")
+      .select("*, image_recipe(image_url)") // Include image data
+      .eq("category_id", 5); // Filter for occasion recipes
+
+    if (error) throw error;
+
+    console.log("Fetched occasion recipes:", data); // Debugging
+
+    return data.map((recipe: any) => ({
+      ...recipe,
+      image_url: recipe.image_recipe?.[0]?.image_url || " " // Handle missing images
+    })) as Recipe[];
+  } catch (error) {
+    console.error("Error fetching occasion recipes:", error);
+    return [];
+  }
+}
+
+
+
+// Fetch all drink Occasion
+export async function getfriedRecipes(): Promise<Recipe[]> {
+  try {
+    const { data, error } = await supabase
+      .from("recipe")
+      .select("*, image_recipe(image_url)") // Include image data
+      .eq("category_id", 3); // Filter for occasion recipes
+
+    if (error) throw error;
+
+    console.log("Fetched occasion recipes:", data); // Debugging
+
+    return data.map((recipe: any) => ({
+      ...recipe,
+      image_url: recipe.image_recipe?.[0]?.image_url || " " // Handle missing images
+    })) as Recipe[];
+  } catch (error) {
+    console.error("Error fetching occasion recipes:", error);
+    return [];
   }
 }

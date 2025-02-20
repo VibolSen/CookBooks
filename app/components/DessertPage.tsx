@@ -14,17 +14,17 @@ interface Recipe {
   ingredients: string;
 }
 
-interface SoupPageClientProps {
+interface DessertPageClientProps {
   user: any; // Replace `any` with your user type
   recipes: Recipe[];
 }
 
-const DessertPageClient: React.FC<SoupPageClientProps> = ({ user, recipes }) => {
+const DessertPageClient: React.FC<DessertPageClientProps> = ({ user, recipes }) => {
   return (
     <div>
       {/* Main content */}
       <div className="p-8">
-        <h1 className="text-3xl font-bold mb-8 text-center">Drinks</h1>
+        <h1 className="text-3xl font-bold mb-8 text-center">Dessert</h1>
         <div className="flex flex-wrap justify-center gap-6">
           {recipes.map((recipe) => (
             <div className="flex justify-center" key={recipe.recipe_id}>

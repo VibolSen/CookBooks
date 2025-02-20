@@ -2,8 +2,6 @@ import '@/app/globals.css'
 import { Metadata } from 'next';
 import { Inter } from 'next/font/google'
 
-
-
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -12,19 +10,14 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        media: "(prefers-color-scheme: light)",
-        url: "public/image/favicon.png",
-        href: "public/image/favicon.png",
-      },
-      {
-        media: "(prefers-color-scheme: dark)",
-        url: "public/image/favicon.png",
-        href: "public/image/favicon.png",
+        rel: "icon",
+        sizes: "any",
+        url: "/image/favicon.png", // Corrected path
+        href: "/image/favicon.png", // Corrected path
       },
     ],
   },
 };
-
 
 export default function RootLayout({
   children,
@@ -35,18 +28,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-  <link
-    href="https://fonts.googleapis.com/icon?family=Material+Icons"
-    rel="stylesheet"
-  />
-</head>
-      <body className="antialiased bg-white text-gray-900">
-        <main >
-        {children}
+        <link
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet"
+        />
+      </head>
+      <body className={`${inter.className} antialiased bg-white text-gray-900`}>
+        <main>
+          {children}
         </main>
       </body>
     </html>
   );
 }
-
-

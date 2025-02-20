@@ -14,12 +14,12 @@ interface Recipe {
   ingredients: string;
 }
 
-interface SoupPageClientProps {
+interface DrinksPageClientProps {
   user: any; // Replace `any` with your user type
   recipes: Recipe[];
 }
 
-const DrinksPageClient: React.FC<SoupPageClientProps> = ({ user, recipes }) => {
+const DrinksPageClient: React.FC<DrinksPageClientProps> = ({ user, recipes }) => {
   return (
     <div>
       {/* Main content */}

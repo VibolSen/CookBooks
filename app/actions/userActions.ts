@@ -7,6 +7,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+
 export const getUserById = async (userId: number) => {
   console.log("🔍 Fetching user ID:", userId);
 
@@ -21,9 +22,23 @@ export const getUserById = async (userId: number) => {
     return null;
   }
 
-  console.log("✅ User fetched:", data);
+  if (data?.image_url) {
+    // Generate signed URL if the storage is private
+    const { data: signedUrlData } = await supabase.storage
+      .from("your-bucket-name")
+      .createSignedUrl(data.image_url, 60); // URL expires in 60 seconds
+
+    if (signedUrlData?.signedUrl) {
+      data.image_url = signedUrlData.signedUrl;
+    } else {
+      console.warn("⚠️ Failed to generate signed URL");
+    }
+  }
+
+  console.log("✅ User fetched with image URL:", data);
   return data;
 };
+
 
 
 

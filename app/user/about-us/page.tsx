@@ -1,83 +1,127 @@
+import React from 'react';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 export default function TeamSectionPage() {
   return (
-    <div className="px-20 py-10">
-      <h1 className="text-3xl font-bold mb-4 text-center">Our Team Member</h1>
-      <p className="mb-6 text-center text-gray-600">
-        We aim to make cooking accessible and enjoyable for everyone, no matter
-        your skill level.
-      </p>
+    <div className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Headline and Description */}
+        <div className="text-center">
+          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            Our Team Members
+          </h1>
+          <p className="mt-3 text-lg text-gray-600 sm:mt-4">
+            We aim to make cooking accessible and enjoyable for everyone, no
+            matter your skill level.
+          </p>
+        </div>
 
-      <div className="flex justify-center space-x-10 mb-10">
-  <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-xs">
-    <img
-      src="../team/team.png"
-      alt="Mr. Sen Vibol"
-      className="w-[300px] h-[300px] object-cover rounded-full mb-2"
-    />
-    <p className="font-semibold">Mr. Sen Vibol</p>
-    <div className="flex space-x-6 mt-2">
-      <a href="#" className="text-blue-500 hover:underline">
-        <i className="fab fa-facebook-f w-6 h-6"></i> {/* Facebook Icon */}
-      </a>
-      <a href="#" className="text-blue-500 hover:underline">
-        <i className="fab fa-instagram w-6 h-6"></i> {/* Instagram Icon */}
-      </a>
-      <a href="#" className="text-blue-500 hover:underline">
-        <i className="fab fa-github w-6 h-6"></i> {/* GitHub Icon */}
-      </a>
-    </div>
-  </div>
+        {/* Team Members */}
+        <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Member 1 */}
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center p-6 transition-transform hover:scale-105">
+            <img
+              src="../team/team.png" // Replace with actual image URL
+              alt="Mr. Sen Vibol"
+              className="w-40 h-40 object-cover rounded-full mb-4 border-2 border-blue-200"
+            />
+            <h3 className="text-lg font-medium text-gray-900">Mr. Sen Vibol</h3>
+            <div className="flex space-x-4 mt-2">
+              <a
+                href="#"
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+              >
+                <i className="fab fa-facebook-f"></i>
+              </a>
+              <a
+                href="#"
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+              >
+                <i className="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+              >
+                <i className="fab fa-github"></i>
+              </a>
+            </div>
+          </div>
 
-  <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-xs">
-    <img
-      src="../team/team.png"
-      alt="Mr. Khorn Soukhouch"
-      className="w-[300px] h-[300px] object-cover rounded-full mb-2"
-    />
-    <p className="font-semibold">Mr. Khorn Soukhouch</p>
-    <div className="flex space-x-6 mt-2">
-      <a href="#" className="text-blue-500 hover:underline">
-        <i className="fab fa-facebook-f w-6 h-6"></i> {/* Facebook Icon */}
-      </a>
-      <a href="#" className="text-blue-500 hover:underline">
-        <i className="fab fa-instagram w-6 h-6"></i> {/* Instagram Icon */}
-      </a>
-      <a href="#" className="text-blue-500 hover:underline">
-        <i className="fab fa-github w-6 h-6"></i> {/* GitHub Icon */}
-      </a>
-    </div>
-  </div>
+          {/* Member 2 */}
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center p-6 transition-transform hover:scale-105">
+            <img
+              src="../team/team.png" // Replace with actual image URL
+              alt="Mr. Khorn Soukhouch"
+              className="w-40 h-40 object-cover rounded-full mb-4 border-2 border-blue-200"
+            />
+            <h3 className="text-lg font-medium text-gray-900">
+              Mr. Khorn Soukhouch
+            </h3>
+            <div className="flex space-x-4 mt-2">
+              <a
+                href="#"
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+              >
+                <i className="fab fa-facebook-f"></i>
+              </a>
+              <a
+                href="#"
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+              >
+                <i className="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+              >
+                <i className="fab fa-github"></i>
+              </a>
+            </div>
+          </div>
 
-  <div className="flex flex-col items-center bg-white p-4 rounded-lg shadow-lg max-w-xs">
-    <img
-      src="../team/team.png"
-      alt="Ms. Sam Nisa"
-      className="w-[300px] h-[300px] object-cover rounded-full mb-2"
-    />
-    <p className="font-semibold">Ms. Sam Nisa</p>
-    <div className="flex space-x-6 mt-2">
-      <a href="#" className="text-blue-500 hover:underline">
-        <i className="fab fa-facebook-f w-6 h-6"></i> {/* Facebook Icon */}
-      </a>
-      <a href="#" className="text-blue-500 hover:underline">
-        <i className="fab fa-instagram w-6 h-6"></i> {/* Instagram Icon */}
-      </a>
-      <a href="#" className="text-blue-500 hover:underline">
-        <i className="fab fa-github w-6 h-6"></i> {/* GitHub Icon */}
-      </a>
-    </div>
-  </div>
-</div>
+          {/* Member 3 */}
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center p-6 transition-transform hover:scale-105">
+            <img
+              src="../team/team.png" // Replace with actual image URL
+              alt="Ms. Sam Nisa"
+              className="w-40 h-40 object-cover rounded-full mb-4 border-2 border-blue-200"
+            />
+            <h3 className="text-lg font-medium text-gray-900">Ms. Sam Nisa</h3>
+            <div className="flex space-x-4 mt-2">
+              <a
+                href="#"
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+              >
+                <i className="fab fa-facebook-f"></i>
+              </a>
+              <a
+                href="#"
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+              >
+                <i className="fab fa-instagram"></i>
+              </a>
+              <a
+                href="#"
+                className="text-blue-500 hover:text-blue-700 transition-colors"
+              >
+                <i className="fab fa-github"></i>
+              </a>
+            </div>
+          </div>
+        </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg mt-8 text-center">
-        <h2 className="text-2xl font-semibold mb-2">Our Visions</h2>
-        <p className="text-gray-600 mb-2">What is our vision to do next?</p>
-        <p className="text-gray-700">
-          Our team is made up of food enthusiasts, recipe developers, and
-          culinary storytellers. We are committed to testing and refining every
-          recipe, so you can be confident that when you cook with us, you're
-          making something truly special.
-        </p>
+        {/* Our Vision Section */}
+        <div className="mt-16 bg-white p-8 rounded-lg shadow-xl text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Vision</h2>
+          <p className="text-gray-600 mb-4">What is our vision to do next?</p>
+          <p className="text-gray-700">
+            Our team is made up of food enthusiasts, recipe developers, and
+            culinary storytellers. We are committed to testing and refining
+            every recipe, so you can be confident that when you cook with us,
+            you're making something truly special.
+          </p>
+        </div>
       </div>
     </div>
   );
