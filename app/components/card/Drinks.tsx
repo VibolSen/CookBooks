@@ -4,9 +4,9 @@ import Link from 'next/link';
 interface RecipeData {
   recipe_id: number;
   recipe_name: string;
-  cook_time   : string;
+  cook_time: string;
   rating: number;
-  image_url: string;
+  image_url: string; // Updated prop name
   description: string;
   ingredients: string;
 }
@@ -16,7 +16,7 @@ const Drinks: React.FC<RecipeData> = ({
   recipe_name, 
   cook_time, 
   rating, 
-  image_url, 
+  image_url, // Updated prop name
   description, 
   ingredients 
 }) => {
@@ -27,12 +27,12 @@ const Drinks: React.FC<RecipeData> = ({
       <div className="relative h-48">
         <img
           className="w-full h-full object-cover"
-          src={image_url}
+          src={image_url} // Updated prop name
           alt={recipe_name}
         />
         
         {/* Save Recipe Button */}
-        <Link href={`/save-recipe/${recipe_id}`} className="absolute top-2 left-2">
+        <Link href={`/user/save-recipe/${recipe_id}`} className="absolute top-2 left-2">
           <FaBookmark className="h-6 w-6 text-white hover:text-blue-600 transition-colors duration-300" />
         </Link>
       </div>
