@@ -76,7 +76,7 @@ export default function Navbar({ user }: NavbarProps) {
               <input type="text" className="border border-gray-500 rounded-full pl-4 pr-10 py-3 text-sm" placeholder="Search by name" />
 
               {/* Add Recipe Link */}
-              <Link href={isLoggedIn ? "/add-recipe" : "/login"} className="text-lg font-medium text-blue-600 hover:text-blue-800">
+              <Link href={isLoggedIn ? "/user/add-recipe" : "/login"} className="text-lg font-medium text-blue-600 hover:text-blue-800">
                 + Add a Recipe
               </Link>
 
@@ -84,7 +84,7 @@ export default function Navbar({ user }: NavbarProps) {
               <div className="flex items-center space-x-4">
                 {isLoggedIn ? (
                   <>
-                    <Link href="/save" className="hover:text-gray-700">
+                    <Link href="/profile/save-recipe" className="hover:text-gray-700">
                       <span className="material-icons text-gray-600 w-5 h-5">bookmark_border</span>
                     </Link>
                     <Link href="/profile/profileUser">

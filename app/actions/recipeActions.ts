@@ -7,17 +7,23 @@ interface Recipe {
   prep_time: number;
   cook_time: number;
   image_url: string;
-  rating: number;
+  average_rating: number; // Change this to average_rating
   ingredients: string;
   author: string;
   date: string;
 }
 
+// Function to fetch a recipe by its ID
 export async function getRecipeById(recipeId: number): Promise<Recipe | null> {
   try {
     const { data, error } = await supabase
       .from("recipe")
-      .select("*, image_recipe(image_url)")
+      .select(`
+        *,
+        image_recipe(image_url),
+        users(user_name),
+        reviews(rating)  
+      `)
       .eq("recipe_id", recipeId)
       .single(); // Ensures only one recipe is returned
 
@@ -28,9 +34,15 @@ export async function getRecipeById(recipeId: number): Promise<Recipe | null> {
       return null;
     }
 
+    // Calculate average rating from reviews
+    const ratings = data.reviews.map((review: { rating: number }) => review.rating);
+    const average_rating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+
     return {
       ...data,
-      image_url: data.image_recipe?.[0]?.image_url || " " // Handle array response
+      image_url: data.image_recipe?.[0]?.image_url || " ", // Handle array response
+      average_rating, // Include average rating
+      author: data.users?.user_name || "Unknown User", // Include author
     };
   } catch (error) {
     console.error("Error fetching recipe:", error);
@@ -38,30 +50,33 @@ export async function getRecipeById(recipeId: number): Promise<Recipe | null> {
   }
 }
 
-
-// Fetch all drink recipes
 export async function getDrinkRecipes(): Promise<Recipe[]> {
   try {
     const { data, error } = await supabase
       .from("recipe")
-      .select("*, image_recipe(image_url)") // Ensure image_url is selected
+      .select("*, image_recipe(image_url), reviews(rating)")
       .eq("category_id", 4); // Filter for drinks
 
     if (error) throw error;
 
     console.log("Fetched recipes:", data); // Debugging: Check the response
 
-    return data.map((recipe: any) => ({
-      ...recipe,
-      image_url: recipe.image_recipe?.[0]?.image_url ?? " "
-    })) as Recipe[];
+    // Calculate average rating from reviews
+    return data.map((recipe: any) => {
+      const ratings = recipe.reviews.map((review: any) => review.rating);
+      const averageRating = ratings.length > 0 ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length : 0;
+
+      return {
+        ...recipe,
+        image_url: recipe.image_recipe?.[0]?.image_url ?? " ",
+        average_rating: averageRating || 0, // Add average rating to the returned object
+      };
+    }) as Recipe[];
   } catch (error) {
     console.error("Error fetching drink recipes:", error);
     return [];
   }
 }
-
-
 
 // Fetch all soup recipes
 export async function getSoupRecipes(): Promise<Recipe[]> {
@@ -85,7 +100,6 @@ export async function getSoupRecipes(): Promise<Recipe[]> {
   }
 }
 
-
 // Fetch all drink Occasion
 export async function getOccasionRecipes(): Promise<Recipe[]> {
   try {
@@ -107,8 +121,6 @@ export async function getOccasionRecipes(): Promise<Recipe[]> {
     return [];
   }
 }
-
-
 
 // Fetch all  Dessert
 export async function getDessertRecipes(): Promise<Recipe[]> {
@@ -132,8 +144,6 @@ export async function getDessertRecipes(): Promise<Recipe[]> {
   }
 }
 
-
-
 // Fetch all drink Occasion
 export async function getfriedRecipes(): Promise<Recipe[]> {
   try {
@@ -155,3 +165,51 @@ export async function getfriedRecipes(): Promise<Recipe[]> {
     return [];
   }
 }
+
+
+// Fetch saved items from Supabase
+export const removeSavedItem = async (recipeId, userId) => {
+  try {
+    const { error } = await supabase
+      .from("saved_recipes")
+      .delete()
+      .eq("recipe_id", recipeId)
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("Error removing item:", error.message);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Unexpected error removing item:", error);
+    return false;
+  }
+};
+
+
+// Remove a saved item from Supabase
+export const fetchSavedItems = async (userId) => {
+  try {
+    const { data, error } = await supabase
+      .from("saved_recipes")
+      .select(`
+        recipe_id,
+        recipe:recipe_id (
+          recipe_name,
+          description,
+          image_url
+        )
+      `)
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("Error fetching saved recipes:", error.message);
+      return [];
+    }
+    return data || [];
+  } catch (error) {
+    console.error("Unexpected error fetching saved recipes:", error);
+    return [];
+  }
+};
