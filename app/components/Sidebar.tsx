@@ -12,7 +12,7 @@ const SidebarNav = () => {
     { href: "/profile/edit-profile", label: "Edit Profile", icon: "edit" },
     { href: "/profile/my-recipes", label: "My Recipes", icon: "work" },
     { href: "/profile/reset-password", label: "Reset Password", icon: "lock" },
-    { href: "/profile/save", label: "Save", icon: "save" },
+    { href: "/profile/save-recipe", label: "Save", icon: "save" },
   ];
 
   return (
