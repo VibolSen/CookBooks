@@ -3,7 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/app/lib/supabaseClient";
+import { signIn, getSession } from "next-auth/react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, Heart, Sparkles } from "lucide-react";
@@ -30,6 +30,7 @@ const itemVariants = {
 };
 
 export default function LoginPage() {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -43,49 +44,32 @@ export default function LoginPage() {
     setErrorMessage("");
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const result = await signIn("credentials", {
+        redirect: false,
         email,
         password,
       });
 
-      if (error || !data) {
-        throw new Error(
-          error?.message ||
-            "Oops! Something went wrong. Please check your credentials and try again."
-        );
+      if (result?.error) {
+        throw new Error(result.error);
       }
 
-      const user = data.user;
-      const { data: userMetadata, error: metadataError } = await supabase
-        .from("users")
-        .select("role")
-        .eq("user_id", user.id)
-        .single();
-
-      if (metadataError) {
-        throw new Error(
-          metadataError.message ||
-            "We're having trouble accessing your account details."
-        );
+      const session = await getSession();
+      if (session?.user) {
+        const role = (session.user as any).role;
+        const id = (session.user as any).id;
+        if (role === "Admin") {
+          router.push(`/admin/${id}/dashboard`);
+        } else {
+          router.push("/");
+        }
       }
-
-      const role = userMetadata?.role || "User";
-
-      document.cookie = `user=${encodeURIComponent(
-        JSON.stringify({
-          id: user.id,
-          email: user.email,
-          role: role,
-        })
-      )}; path=/; max-age=${30 * 24 * 60 * 60}`;
-
-      const redirectUrl = role === "Admin" ? `/admin/${user.id}/dashboard` : `/`;
-      router.push(redirectUrl);
+      router.refresh();
     } catch (err: unknown) {
       if (err instanceof Error) {
         setErrorMessage(err.message);
       } else {
-        setErrorMessage("We couldn't sign you in right now. Please try again!");
+        setErrorMessage("We couldn't sign you in right now.");
       }
     } finally {
       setIsLoading(false);
@@ -93,27 +77,9 @@ export default function LoginPage() {
   }
 
   async function handleGoogleLogin() {
-    const redirectTo = process.env.NEXT_PUBLIC_SUPABASE_REDIRECT_URL;
-    console.log("Redirect URL:", redirectTo);
-
-    if (!redirectTo) {
-      console.error("Missing environment variable: NEXT_PUBLIC_SUPABASE_REDIRECT_URL");
-      setErrorMessage("Login setup error. Please try again later.");
-      return;
-    }
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    });
-
-    if (error) {
-      console.error("OAuth login error:", error.message);
-      setErrorMessage(
-        error.message || "Google sign-in didn't work this time. Let's try again!"
-      );
-    }
+    signIn("google");
   }
+
 
   return (
     <motion.div

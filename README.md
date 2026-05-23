@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🍳 CookBook
 
-## Getting Started
+A premium, modern recipe management platform built with Next.js 15, focusing on a vibrant community of chefs and food enthusiasts.
 
-First, run the development server:
+## 🚀 Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Database**: [MongoDB](https://www.mongodb.com/) via [Prisma ORM](https://www.prisma.io/)
+- **Authentication**: [NextAuth.js](https://next-auth.js.org/)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/)
+- **Image Hosting**: [Cloudinary](https://cloudinary.com/)
+- **Icons**: [Lucide React](https://lucide.dev/), [FontAwesome](https://fontawesome.com/)
+- **UI Components**: Radix UI, Material UI (MUI)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ✨ Key Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Recipe Discovery**: Browse popular creations and recipes of the week.
+- **Categorization**: filter by diet, occasion, or cuisine.
+- **User Profiles**: Manage your own culinary works and favorites.
+- **Community Interaction**: Rate and review recipes from other chefs.
+- **Image Support**: Multiple high-quality images per recipe via Cloudinary.
+- **Admin Dashboard**: Full control over content management.
+- **Responsive Design**: Optimized for both mobile and desktop experiences.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Getting Started
 
-## Learn More
+### Prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+- Node.js 18+ 
+- MongoDB Instance (Atlas or Local)
+- Cloudinary Account
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/VibolSen/CookBooks.git
+   cd CookBooks
+   ```
 
-## Deploy on Vercel
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Environment Setup:**
+   Create a `.env` file in the root directory and add the following:
+   ```env
+   # Database
+   MONGODB_URI="mongodb+srv://..."
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   # NextAuth
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-secret"
+
+   # Cloudinary
+   CLOUDINARY_CLOUD_NAME="your-cloud-name"
+   CLOUDINARY_API_KEY="your-api-key"
+   CLOUDINARY_API_SECRET="your-api-secret"
+
+   # Auth Providers (Optional)
+   GOOGLE_CLIENT_ID="..."
+   GOOGLE_CLIENT_SECRET="..."
+   ```
+
+4. **Prisma Setup:**
+   ```bash
+   npx prisma generate
+   ```
+
+5. **Run Development Server:**
+   ```bash
+   npm run dev
+   ```
+
+## 📂 Project Structure
+
+- `/app`: Next.js App Router (Pages, Layouts, API)
+- `/app/actions`: Server Actions for database operations
+- `/app/components`: Reusable UI components
+- `/app/lib`: Shared utilities (Prisma client, Auth options)
+- `/prisma`: Database schema definition
+- `/public`: Static assets (Logos, Placeholders)
+
+## 📜 License
+
+Distributed under the MIT License.

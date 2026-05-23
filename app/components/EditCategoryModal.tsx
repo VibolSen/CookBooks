@@ -1,14 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { supabase } from "../lib/supabaseClient";
-import { v4 as uuidv4 } from "uuid";
+import { updateCategory } from "@/app/actions/categoryActions";
 import { motion } from "framer-motion";
 import { XCircle, ImageIcon, AlertTriangle } from "lucide-react";
 import Image from "next/image";
 
 type Category = {
-  category_id: string;
+  id: string;
   category_name: string;
   image: string;
 };
@@ -27,7 +26,6 @@ const EditCategoryModal = ({
   onCategoryUpdated,
 }: EditCategoryModalProps) => {
   const [categoryName, setCategoryName] = useState<string>("");
-  const [image, setImage] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -36,7 +34,6 @@ const EditCategoryModal = ({
   useEffect(() => {
     if (category) {
       setCategoryName(category.category_name);
-      setImage(category.image);
       setImagePreview(category.image);
     }
   }, [category]);
@@ -59,59 +56,34 @@ const EditCategoryModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!category) return;
 
     setLoading(true);
     setError(null);
-    let updatedImageUrl = image;
 
+    const formData = new FormData();
+    formData.append("id", category.id);
+    formData.append("category_name", categoryName);
     if (imageFile) {
-      try {
-        const fileName = `${uuidv4()}-${imageFile.name}`;
-
-        const { error: storageError } = await supabase
-          .storage
-          .from("images") // Change this to your bucket name
-          .upload(fileName, imageFile, {
-            cacheControl: "3600",
-            upsert: true, // Overwrite the file if it already exists
-          });
-
-        if (storageError) throw storageError;
-
-        updatedImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${fileName}`;
-      } catch (error: unknown) { // Change type to 'unknown'
-        console.error("Error uploading image:", error);
-        setError(
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred during image upload."
-        );
-        setLoading(false);
-        return;
-      }
+      formData.append("image", imageFile);
     }
 
-    if (category) {
-      try {
-        const { error } = await supabase
-          .from("category")
-          .update({ category_name: categoryName, image: updatedImageUrl })
-          .eq("category_id", category.category_id);
+    try {
+      const result = await updateCategory(formData);
 
-        if (error) throw error;
-
-        onCategoryUpdated(); // Callback to refresh data
-        onClose(); // Close modal
-      } catch (error: unknown) { // Change type to 'unknown'
-        console.error("Error updating category:", error);
-        setError(
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred while updating the category."
-        );
-      } finally {
-        setLoading(false);
+      if (!result.success) {
+        throw new Error(result.error);
       }
+
+      onCategoryUpdated();
+      onClose();
+    } catch (dbErr: unknown) {
+      console.error("Category update error:", dbErr);
+      setError(
+        dbErr instanceof Error ? dbErr.message : "Category update failed."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -129,7 +101,7 @@ const EditCategoryModal = ({
     <>
       {isOpen && category && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center  bg-opacity-50"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
           variants={backdropVariants}
           initial="hidden"
           animate="visible"
@@ -200,13 +172,14 @@ const EditCategoryModal = ({
                   />
                 </label>
                 {imagePreview && (
-                  <Image
-                    src={imagePreview}
-                    alt="Preview"
-                    width={96}
-                    height={96}
-                    className="mt-2 object-cover rounded-full mx-auto"
-                  />
+                  <div className="mt-2 relative w-24 h-24 mx-auto">
+                    <Image
+                      src={imagePreview}
+                      alt="Preview"
+                      fill
+                      className="object-cover rounded-full"
+                    />
+                  </div>
                 )}
               </div>
 

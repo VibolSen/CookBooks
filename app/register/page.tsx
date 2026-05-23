@@ -4,21 +4,11 @@ import type React from "react";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "../lib/supabaseClient";
-import { Eye, EyeOff } from "lucide-react"; // Add Eye and EyeOff icons
+import { registerUser } from "@/app/actions/authActions";
+import { signIn } from "next-auth/react";
+import { Eye, EyeOff, Mail, Lock, User, CheckCircle, Heart, Sparkles, UserPlus, Shield, Gift } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import {
-  Mail,
-  Lock,
-  User,
-  CheckCircle,
-  Heart,
-  Sparkles,
-  UserPlus,
-  Shield,
-  Gift,
-} from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import Image from "next/image";
 
@@ -52,6 +42,7 @@ const floatingVariants = {
 };
 
 export default function RegisterPage() {
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -69,55 +60,30 @@ export default function RegisterPage() {
     setError("");
     setSuccessMessage("");
 
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+
     try {
-      const { data, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: name, role: "User" },
-        },
-      });
+      const result = await registerUser(formData);
 
-      if (authError) {
-        throw authError;
-      }
-
-      const { user } = data;
-
-      if (!user) {
-        throw new Error("User registration failed. Please try again.");
-      }
-
-      const { error: userError } = await supabase.from("users").insert([
-        {
-          user_id: user.id,
-          user_name: name,
-          email: user.email,
-          role: "User",
-          status: "Active",
-          created_at: new Date(),
-        },
-      ]);
-
-      if (userError) {
-        throw userError;
+      if (!result.success) {
+        throw new Error(result.error);
       }
 
       setSuccessMessage(
-        "🎉 Welcome to our community! Check your email to verify your account."
+        "🎉 Welcome to our community! Redirecting to login..."
       );
 
       setTimeout(() => {
         router.push("/login");
-      }, 3000);
+      }, 2000);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        setError(
-          error.message ||
-            "Oops! Something went wrong. Let's try that again! 😊"
-        );
+        setError(error.message || "Oops! Something went wrong.");
       } else {
-        setError("Something unexpected happened. Please give it another try!");
+        setError("Something unexpected happened.");
       }
     } finally {
       setIsLoading(false);
@@ -125,25 +91,9 @@ export default function RegisterPage() {
   };
 
   async function handleGoogleSignUp() {
-    const redirectTo = process.env.NEXT_PUBLIC_SUPABASE_REDIRECT_URL;
-
-    if (!redirectTo) {
-      setError("Setup error. Please try again later.");
-      return;
-    }
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
-    });
-
-    if (error) {
-      setError(
-        error.message ||
-          "Google sign-up didn't work this time. Let's try again!"
-      );
-    }
+    signIn("google", { callbackUrl: "/" });
   }
+
 
   return (
     <motion.div

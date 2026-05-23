@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { supabase } from "../lib/supabaseClient"; // Ensure correct import path
+import { signOut } from "next-auth/react";
 import HomeIcon from "@mui/icons-material/Home";
 import EditIcon from "@mui/icons-material/Edit";
 import WorkIcon from "@mui/icons-material/Work";
@@ -13,22 +13,20 @@ import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { motion } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/app/components/ui/dialog";
 import { Button } from "@/app/components/ui/button";
-import { User } from "@/app/types"; // Import shared User type
+import { User } from "@/app/types";
 
 interface SidebarNavProps {
-  user: User | null; // Accept user as a prop
+  user: User | null;
 }
 
 const SidebarNav = ({ user }: SidebarNavProps) => {
   const pathname = usePathname();
-  const router = useRouter();
-  const [isLogoutOpen, setIsLogoutOpen] = useState(false); // State for logout popup
+  const [isLogoutOpen, setIsLogoutOpen] = useState(false);
 
-  // Logout function
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/"); // Redirect to home page
+    await signOut({ callbackUrl: "/" });
   };
+
 
   // Define menu items based on user authentication
   const menuItems = user

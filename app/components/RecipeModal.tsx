@@ -1,166 +1,136 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabaseClient"; // Import your Supabase client
-import { motion } from "framer-motion"; // Import Framer Motion
+import { getCategories } from "@/app/actions/categoryActions";
+import { getOccasions } from "@/app/actions/occasionActions";
+import { motion } from "framer-motion";
 
 interface RecipeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCategorySelect: (category: { category_id: number; category_name: string }, occasion: { occasion_id: number; name: string }) => void;
+  onCategorySelect: (category: { id: string; name: string }, occasion: { id: string; name: string }) => void;
 }
 
-const RecipeModal: React.FC<RecipeModalProps> = ({
-  isOpen,
-  onClose,
-  onCategorySelect,
-}) => {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [selectedOccasion, setSelectedOccasion] = useState<number | null>(null);
-  const [categories, setCategories] = useState<{ category_id: number; category_name: string }[]>([]);
-  const [occasions, setOccasions] = useState<{ occasion_id: number; name: string }[]>([]);
-  const [loading, setLoading] = useState(true); // Add a loading state
-  const [error, setError] = useState<string | null>(null);  // Add an error state
+const RecipeModal: React.FC<RecipeModalProps> = ({ isOpen, onClose, onCategorySelect }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedOccasion, setSelectedOccasion] = useState<string | null>(null);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [occasions, setOccasions] = useState<{ id: string; name: string }[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCategoriesAndOccasions = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      setError(null); // Clear any previous errors
-
+      setError(null);
       try {
-        // Fetch Categories
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from("category")
-          .select("category_id, category_name");
-
-        if (categoriesError) {
-          throw new Error(categoriesError.message);
-        }
-        setCategories(categoriesData || []); // Ensure it's an array
-
-        // Fetch Occasions
-        const { data: occasionsData, error: occasionsError } = await supabase
-          .from("occasion")
-          .select("occasion_id, name");
-
-        if (occasionsError) {
-          throw new Error(occasionsError.message);
-        }
-        setOccasions(occasionsData || []); // Ensure it's an array
-      } catch (error: unknown) { // Change type to 'unknown'
-        console.error("Error updating category:", error);
-        setError(
-          error instanceof Error
-            ? error.message
-            : "An unexpected error occurred while updating the category."
-        );
+        const [catData, occData] = await Promise.all([getCategories(), getOccasions()]);
+        if (catData.success) setCategories(catData.data || []);
+        if (occData.success) setOccasions(occData.data || []);
+      } catch (err: any) {
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchCategoriesAndOccasions();
+    fetchData();
   }, []);
-
-  const handleOccasionChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const occasionId = parseInt(event.target.value, 10);
-    setSelectedOccasion(occasionId);
-  };
-
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const categoryId = parseInt(event.target.value, 10);
-    setSelectedCategory(categoryId);
-  };
 
   const handleSave = () => {
     if (!selectedCategory || !selectedOccasion) {
       setError("Please select both a category and an occasion.");
       return;
     }
-
-    // Find the selected category and occasion objects
-    const category = categories.find(cat => cat.category_id === selectedCategory);
-    const occasion = occasions.find(occ => occ.occasion_id === selectedOccasion);
-
-    if (!category || !occasion) {
-      console.error("Invalid category or occasion selected");
-      return;
+    const category = categories.find((c) => c.id === selectedCategory);
+    const occasion = occasions.find((o) => o.id === selectedOccasion);
+    if (category && occasion) {
+      onCategorySelect(category, occasion);
     }
-
-    // Call the onCategorySelect function with the selected category and occasion objects
-    onCategorySelect(category, occasion);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-opacity-40 flex items-center justify-center z-50">
-      {/* Modal Animation with Motion */}
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <motion.div
-        className="bg-white rounded-lg w-[600px] h-[470px] shadow-xl p-6"
-        initial={{ opacity: 0, y: 50 }}  // Modal starts below the screen and invisible
-        animate={{ opacity: 1, y: 0 }}   // Modal slides up and fades in
-        exit={{ opacity: 0, y: 50 }}     // Modal fades out and moves down when closing
-        transition={{ type: "spring", stiffness: 300, damping: 30 }} // Smooth transition
+        className="bg-white dark:bg-gray-800 rounded-3xl w-full max-w-[600px] shadow-2xl p-8"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
       >
-        <h2 className="text-3xl font-semibold mb-4 text-center text-gray-800">
-          Which type of your <span className="text-blue-600">Recipe?</span>
+        <h2 className="text-3xl font-bold mb-2 text-center text-gray-800 dark:text-white">
+          Which type of your <span className="text-orange-600">Recipe?</span>
         </h2>
-        <p className="mb-6 text-center text-lg text-gray-600">
+        <p className="mb-8 text-center text-gray-600 dark:text-gray-400">
           Please choose a category and occasion for your recipe before posting!
         </p>
 
         {loading ? (
-          <p className="text-center text-gray-500">Loading categories and occasions...</p>
-        ) : error ? (
-          <p className="text-center text-red-500">{error}</p> // Display the error message
+          <div className="flex flex-col items-center py-10">
+            <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="mt-4 text-gray-500">Loading your options...</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-2 gap-6 justify-items-center">
-            <div>
-              <h3 className="font-medium mb-2 text-lg text-gray-700">Category</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+              <h3 className="font-bold mb-4 text-lg text-gray-800 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Category</h3>
               {categories.map((category) => (
-                <label key={category.category_id} className="flex items-center mb-3">
+                <label key={category.id} className="flex items-center mb-4 cursor-pointer group">
                   <input
                     type="radio"
-                    value={category.category_id}
-                    checked={selectedCategory === category.category_id}
-                    onChange={handleCategoryChange}
-                    className="mr-2 cursor-pointer w-5 h-5"
+                    name="category"
+                    value={category.id}
+                    checked={selectedCategory === category.id}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="mr-3 w-5 h-5 text-orange-600 focus:ring-orange-500 border-gray-300 rounded-full"
                   />
-                  <span className="text-gray-700">{category.category_name}</span>
+                  <span className={`text-lg transition-colors ${selectedCategory === category.id ? "text-orange-600 font-medium" : "text-gray-700 dark:text-gray-300 group-hover:text-orange-500"}`}>
+                    {category.name}
+                  </span>
                 </label>
               ))}
             </div>
 
-            <div>
-              <h3 className="font-medium mb-2 text-lg text-gray-700">Occasion</h3>
+            <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+              <h3 className="font-bold mb-4 text-lg text-gray-800 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">Occasion</h3>
               {occasions.map((occasion) => (
-                <label key={occasion.occasion_id} className="flex items-center mb-3">
+                <label key={occasion.id} className="flex items-center mb-4 cursor-pointer group">
                   <input
                     type="radio"
-                    value={occasion.occasion_id}
-                    checked={selectedOccasion === occasion.occasion_id}
-                    onChange={handleOccasionChange}
-                    className="mr-2 cursor-pointer w-5 h-5"
+                    name="occasion"
+                    value={occasion.id}
+                    checked={selectedOccasion === occasion.id}
+                    onChange={(e) => setSelectedOccasion(e.target.value)}
+                    className="mr-3 w-5 h-5 text-orange-600 focus:ring-orange-500 border-gray-300 rounded-full"
                   />
-                  <span className="text-gray-700">{occasion.name}</span>
+                  <span className={`text-lg transition-colors ${selectedOccasion === occasion.id ? "text-orange-600 font-medium" : "text-gray-700 dark:text-gray-300 group-hover:text-orange-500"}`}>
+                    {occasion.name}
+                  </span>
                 </label>
               ))}
             </div>
           </div>
         )}
 
-        <div className="flex justify-end gap-4 mt-6">
-          <button
-            onClick={handleSave}
-            className={`bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition duration-300 ${!selectedCategory || !selectedOccasion ? "opacity-50 cursor-not-allowed" : ""}`}
-            disabled={!selectedCategory || !selectedOccasion} // Disable the button if either is not selected
-          >
-            Save
-          </button>
+        {error && (
+          <p className="text-red-500 text-sm mb-4 text-center bg-red-50 dark:bg-red-900/20 p-2 rounded-lg">
+            {error}
+          </p>
+        )}
+
+        <div className="flex justify-end gap-4 mt-4">
           <button
             onClick={onClose}
-            className="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 transition duration-300"
+            className="px-8 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300"
           >
             Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!selectedCategory || !selectedOccasion || loading}
+            className="px-8 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Save Choice
           </button>
         </div>
       </motion.div>

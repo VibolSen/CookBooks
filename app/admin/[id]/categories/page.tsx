@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { supabase } from "@/app/lib/supabaseClient";
+import { useState, useEffect } from "react";
+import { getCategories, deleteCategory } from "@/app/actions/categoryActions";
 import Image from "next/image";
 import AddCategoryModal from "@/app/components/AddCategoryModal";
 import EditCategoryModal from "@/app/components/EditCategoryModal";
@@ -23,10 +23,11 @@ import {
 } from "lucide-react";
 
 type Category = {
-  category_id: string;
+  id: string;
   category_name: string;
   image: string;
 };
+
 
 export default function CategoriesManagement() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -51,35 +52,23 @@ export default function CategoriesManagement() {
   }, []);
 
   useEffect(() => {
-    if (successMessage || error) {
-      const timer = setTimeout(() => {
-        setSuccessMessage(null);
-        setError(null);
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage, error]);
-
-  const filterCategories = useCallback(() => {
-    let filtered = categories;
-    if (searchTerm) {
-      filtered = filtered.filter((category) =>
-        category.category_name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+    const filtered = categories.filter((cat) =>
+      cat.category_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     setFilteredCategories(filtered);
   }, [categories, searchTerm]);
-
-  useEffect(() => {
-    filterCategories();
-  }, [filterCategories]);
 
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.from("category").select("*");
-      if (error) throw error;
-      setCategories(data || []);
+      const result = await getCategories();
+      if (!result.success) throw new Error(result.error);
+      const data = (result.data || []).map((cat: any) => ({
+        id: cat.id,
+        category_name: cat.category_name,
+        image: cat.image || "",
+      }));
+      setCategories(data);
     } catch (error) {
       setError(`Error fetching categories: ${(error as Error).message}`);
     } finally {
@@ -87,13 +76,10 @@ export default function CategoriesManagement() {
     }
   };
 
-  const deleteCategory = async (id: string) => {
+  const handleDeleteCategory = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from("category")
-        .delete()
-        .eq("category_id", id);
-      if (error) throw error;
+      const result = await deleteCategory(id);
+      if (!result.success) throw new Error(result.error);
       setSuccessMessage("Category deleted successfully!");
       fetchCategories();
     } catch (error) {
@@ -101,13 +87,14 @@ export default function CategoriesManagement() {
     }
   };
 
+
   const handleDeleteItem = (id: string) => {
     setItemToDelete(id);
     setShowDeleteConfirmation(true);
   };
 
   const handleConfirmDelete = () => {
-    deleteCategory(itemToDelete);
+    handleDeleteCategory(itemToDelete);
     setShowDeleteConfirmation(false);
   };
 
@@ -338,7 +325,7 @@ export default function CategoriesManagement() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredCategories.map((category, index) => (
                   <motion.div
-                    key={category.category_id}
+                    key={category.id}
                     className="group bg-gradient-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-600"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -389,7 +376,7 @@ export default function CategoriesManagement() {
                       </motion.button>
                       <motion.button
                         onClick={() =>
-                          handleDeleteItem(String(category.category_id))
+                          handleDeleteItem(category.id)
                         }
                         className="p-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all duration-200"
                         whileHover={{ scale: 1.05 }}
@@ -448,7 +435,7 @@ export default function CategoriesManagement() {
                 {filteredCategories.length > 0 ? (
                   filteredCategories.map((category, index) => (
                     <motion.tr
-                      key={category.category_id}
+                      key={category.id}
                       className="hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200"
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -511,7 +498,7 @@ export default function CategoriesManagement() {
 
                           <motion.button
                             onClick={() =>
-                              handleDeleteItem(String(category.category_id))
+                              handleDeleteItem(category.id)
                             }
                             className="p-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all duration-200"
                             whileHover={{ scale: 1.05 }}

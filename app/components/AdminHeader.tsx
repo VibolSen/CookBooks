@@ -3,7 +3,6 @@
 import React from "react";
 import { Menu, Bell } from "lucide-react";
 import { useParams } from "next/navigation";
-import { supabase } from "@/app/lib/supabaseClient";
 import ProfileDropdown from "./ProfileDropdown";
 
 interface Notification {
@@ -63,14 +62,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   const { id } = useParams() as { id?: string | string[] };
   const normalizedId = Array.isArray(id) ? id[0] : id ?? null;
 
-  const getPublicUrl = (path: string | null) => {
-    if (!path) return null;
-    if (path.startsWith("http")) return path;
-    const { data } = supabase.storage.from("image-user").getPublicUrl(path);
-    return data.publicUrl;
-  };
-
-  const imageUrl = getPublicUrl(adminImageUrl);
+  const imageUrl = adminImageUrl?.startsWith("http") ? adminImageUrl : null;
   const initials = getInitials(adminEmail, adminName);
 
   return (

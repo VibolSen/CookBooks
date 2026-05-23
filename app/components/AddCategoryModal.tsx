@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { supabase } from "../lib/supabaseClient";
-import { v4 as uuidv4 } from "uuid";
-import { motion } from "framer-motion"; // Import framer-motion
-import { XCircle, ImageIcon, AlertTriangle } from "lucide-react"; // Import AlertTriangle
+import { createCategory } from "@/app/actions/categoryActions";
+import { motion } from "framer-motion";
+import { XCircle, ImageIcon, AlertTriangle } from "lucide-react";
 import Image from "next/image";
 
 interface AddCategoryModalProps {
@@ -48,74 +47,29 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
     setLoading(true);
     setError(null);
 
-    let imageUrl: string | null = null;
-
+    const formData = new FormData();
+    formData.append("category_name", categoryName);
     if (imageFile) {
-      try {
-        const fileName = `${uuidv4()}-${imageFile.name}`;
-
-        const { error: storageError } =
-          await supabase.storage
-            .from("images") // Change this to "images" to match your bucket name
-            .upload(fileName, imageFile, {
-              cacheControl: "3600",
-              upsert: false,
-            });
-
-        if (storageError) {
-          console.error("Supabase Storage Error:", storageError); // Log the full error
-          setError(
-            `Image upload failed: ${storageError.message}.  Please check the console for details.`
-          );
-          setLoading(false);
-          return;
-        }
-
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-          console.error(
-            "NEXT_PUBLIC_SUPABASE_URL is not defined in your environment variables!"
-          );
-          setError(
-            "Configuration error: Supabase URL is missing. Please check your .env.local file and restart the server."
-          );
-          setLoading(false);
-          return;
-        }
-
-        imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/${fileName}`; // Ensure 'images' matches your bucket name
-      } catch (uploadErr: unknown) { // Change type to 'unknown'
-        console.error("Image Upload Error:", uploadErr); // Log the full error
-        setError(
-          `Image upload failed: ${
-            uploadErr instanceof Error ? uploadErr.message : "Unknown error"
-          }`
-        );
-        setLoading(false);
-        return;
-      }
+      formData.append("image", imageFile);
     }
 
     try {
-      const { data, error } = await supabase
-        .from("category")
-        .insert([{ category_name: categoryName, image: imageUrl }]);
+      const result = await createCategory(formData);
 
-      if (error) {
-        console.error("Supabase Insert Error:", error); // Log the full error
-        setError(
-          `Category creation failed: ${error.message}. Please check the console for details.`
-        );
-      } else {
-        console.log("Category added successfully:", data);
-        onCategoryAdded();
-        onClose();
+      if (!result.success) {
+        throw new Error(result.error);
       }
+
+      onCategoryAdded();
+      onClose();
+      // Reset form
+      setCategoryName("");
+      setImageFile(null);
+      setImagePreview(null);
     } catch (dbErr: unknown) {
-      console.error("Database Insert Error:", dbErr); // Log the full error
+      console.error("Category creation error:", dbErr);
       setError(
-        `Category creation failed: ${
-          dbErr instanceof Error ? dbErr.message : "Unknown error"
-        }. Please check the console for details.`
+        dbErr instanceof Error ? dbErr.message : "Category creation failed."
       );
     } finally {
       setLoading(false);
@@ -136,14 +90,14 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex justify-center items-center bg-opacity-50"
+      className="fixed inset-0 z-50 flex justify-center items-center bg-black/50"
       variants={backdropVariants}
       initial="hidden"
       animate="visible"
       exit="hidden"
     >
       <motion.div
-        className="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full"
+        className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full"
         variants={modalVariants}
       >
         {/* Header */}
@@ -207,13 +161,14 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
               />
             </label>
             {imagePreview && (
-              <Image
-                src={imagePreview}
-                alt="Category Preview"
-                width={96}
-                height={96}
-                className="mt-2 object-cover rounded-full mx-auto"
-              />
+              <div className="mt-2 relative w-24 h-24 mx-auto">
+                <Image
+                  src={imagePreview}
+                  alt="Category Preview"
+                  fill
+                  className="object-cover rounded-full"
+                />
+              </div>
             )}
           </div>
 

@@ -13,54 +13,25 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Image from "next/image";
-import { supabase } from "@/app/lib/supabaseClient";
+import { getEventById } from "@/app/actions/eventActions";
 import { motion } from "framer-motion";
 import { Badge } from "@/app/components/ui/badge";
 
 interface EventData {
-  event_id: number;
+  id: string;
   title: string;
   description: string | null;
-  start_date: string;
-  end_date: string | null;
-  image_url: string;
-  location?: string;
-  max_participants?: number;
-  current_participants?: number;
-  organizer?: string;
-  contact_email?: string;
-  contact_phone?: string;
-  website?: string;
-  price?: number;
-  category?: string;
-}
-
-async function getEventById(eventId: number): Promise<EventData | null> {
-  try {
-    const { data, error } = await supabase
-      .from("event")
-      .select("*")
-      .eq("event_id", eventId)
-      .single();
-
-    if (error) throw error;
-
-    if (!data) {
-      console.warn("No event found for the ID:", eventId);
-      return null;
-    }
-
-    return data as EventData;
-  } catch (error) {
-    console.error("Error fetching event:", error);
-    return null;
-  }
+  startDate: string | Date;
+  endDate: string | Date | null;
+  imageUrl: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 const EventDetailPage: React.FC = () => {
   const { id } = useParams();
   const router = useRouter();
-  const eventId = Number(id);
+  const eventId = id as string;
   const [event, setEvent] = useState<EventData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -70,8 +41,8 @@ const EventDetailPage: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        if (isNaN(eventId)) {
-          setError("Invalid event ID. Must be a number.");
+        if (!eventId) {
+          setError("Invalid event ID.");
           return;
         }
 
@@ -93,11 +64,11 @@ const EventDetailPage: React.FC = () => {
   }, [eventId]);
 
 
-  const isUpcoming = (dateString: string) => {
+  const isUpcoming = (dateString: string | Date) => {
     return new Date(dateString) > new Date();
   };
 
-  const isToday = (dateString: string) => {
+  const isToday = (dateString: string | Date) => {
     const today = new Date();
     const eventDate = new Date(dateString);
     return (
@@ -205,7 +176,7 @@ const EventDetailPage: React.FC = () => {
         <div className="relative mb-12">
           <div className="relative overflow-hidden rounded-3xl shadow-2xl">
             <Image
-              src={event.image_url || "/placeholder.svg"}
+              src={event.imageUrl || "/placeholder.svg"}
               alt={event.title}
               width={1200}
               height={600}
@@ -219,11 +190,11 @@ const EventDetailPage: React.FC = () => {
 
             {/* Status Badge */}
             <div className="absolute top-6 left-6">
-              {isToday(event.start_date) ? (
+              {isToday(event.startDate) ? (
                 <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 px-4 py-2 text-lg font-bold shadow-lg animate-pulse">
                   🔴 HAPPENING NOW!
                 </Badge>
-              ) : isUpcoming(event.start_date) ? (
+              ) : isUpcoming(event.startDate) ? (
                 <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 px-4 py-2 text-lg font-bold shadow-lg">
                   ✨ Upcoming Event
                 </Badge>

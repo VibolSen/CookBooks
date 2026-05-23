@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userName  String
+  email     String   @unique
+  imageUrl  String?
+  aboutMe   String?
+  password  String?
+  role      String   @default("User")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  recipes      Recipe[]
+  reviews      Review[]
+  savedRecipes SavedRecipe[]
+}
+
+model Category {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  imageUrl  String?
+  createdAt DateTime @default(now())
+
+  recipes   Recipe[]
+}
+
+model Occasion {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  imageUrl  String?
+  createdAt DateTime @default(now())
+
+  recipes   Recipe[]
+}
+
+model Recipe {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  categoryId   String   @db.ObjectId
+  occasionId   String   @db.ObjectId
+  title        String
+  description  String
+  overview     String?
+  prepTime     String?
+  cookTime     String?
+  ingredients  String
+  instructions String
+  note         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id])
+  category     Category @relation(fields: [categoryId], references: [id])
+  occasion     Occasion @relation(fields: [occasionId], references: [id])
+  images       Image[]
+  reviews      Review[]
+  savedRecipes SavedRecipe[]
+}
+
+model Image {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  recipeId  String   @db.ObjectId
+  url       String
+  createdAt DateTime @default(now())
+
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+}
+
+model Event {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+} 
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  recipeId  String   @db.ObjectId
+  userId    String   @db.ObjectId
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
+}
+model SavedRecipe {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  recipeId  String   @db.ObjectId
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId])
+}

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import RecipeCard from "./recipe-card";
 
 type Recipe = {
-  recipe_id: number;
+  recipe_id: string;
   recipe_name: string;
   cook_time: string;
   image_recipe: { image_url: string }[];
@@ -18,8 +18,8 @@ type Recipe = {
 };
 
 type Review = {
-  review_id: number;
-  recipe_id: number;
+  review_id: string;
+  recipe_id: string;
   user_id: string;
   comment: string;
   rating: number;
@@ -37,10 +37,8 @@ interface RecipeGridProps {
   recipes: Recipe[];
   reviews: Review[];
   user: User | null;
-  savedRecipes: number[];
-  onSaveRecipe: (recipeId: number) => void;
-  parseTime: (value: string | number) => number;
-  formatTime: (minutes: number) => string;
+  savedRecipes: string[];
+  onSaveRecipe: (recipeId: string) => void;
   loading?: boolean;
 }
 
@@ -50,8 +48,6 @@ const RecipeGrid = ({
   user,
   savedRecipes,
   onSaveRecipe,
-  parseTime,
-  formatTime,
   loading = false,
 }: RecipeGridProps) => {
   const containerVariants = {
@@ -117,8 +113,6 @@ const RecipeGrid = ({
           user={user}
           savedRecipes={savedRecipes}
           onSaveRecipe={onSaveRecipe}
-          parseTime={parseTime}
-          formatTime={formatTime}
           index={index}
         />
       ))}

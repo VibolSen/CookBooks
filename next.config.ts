@@ -3,29 +3,20 @@ const nextConfig = {
   images: {
     unoptimized: true,
     domains: [
-      'dbueyvwsrhxbwuxwlspo.supabase.co',
-      'your-project.supabase.co', // Add this if you are using a different Supabase project domain
       'img.icons8.com',
       'encrypted-tbn0.gstatic.com',
       'lh3.googleusercontent.com',   // Google profile photos
       'avatars.githubusercontent.com', // GitHub
       'secure.gravatar.com',        // Gravatar
       'gravatar.com',
-      // Add more specific domains as needed
+      'res.cloudinary.com',
     ],
     remotePatterns: [
-      // Support for Supabase storage
       {
         protocol: 'https',
-        hostname: 'dbueyvwsrhxbwuxwlspo.supabase.co',
-        pathname: '/storage/v1/object/public/**',  // Allow any public storage path
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'your-project.supabase.co',  // Another Supabase domain
-        pathname: '/storage/v1/object/public/**',
-      },
-
       // Support for Icons8
       {
         protocol: 'https',
@@ -56,11 +47,6 @@ const nextConfig = {
         hostname: 'gravatar.com',
         pathname: '/**',
       },
-      {
-        protocol: 'https',
-        hostname: 'encrypted-tbn0.gstatic.com',
-        pathname: '/images**',
-      }      
     ],
   },
 };

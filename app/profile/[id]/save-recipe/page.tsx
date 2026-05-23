@@ -1,288 +1,126 @@
-// app/your-path/SavedRecipesPage.tsx (Adjust path as needed)
 "use client";
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/app/lib/supabaseClient";
+import { useState, useEffect, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { getSavedRecipes, toggleSaveRecipe } from "@/app/actions/recipeActions";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Trash2 } from "lucide-react";
+import { Trash2, Heart, Search, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAlert } from "@/app/context/AlertContext"; // <--- IMPORT useAlert
-
-// Define the Recipe type
-type Recipe = {
-  id: string;
-  title: string;
-  description: string;
-  ingredients: string;
-  instructions: string;
-  created_at: string;
-  image_url?: string;
-};
-
-const constructImageUrl = (path: string | null) => {
-  if (!path) return "/default-image.jpg"; // Fallback to a default image
-  if (path.startsWith("http://") || path.startsWith("https://")) return path; // Already a valid URL
-  // Ensure process.env.NEXT_PUBLIC_SUPABASE_URL is correctly set in your .env.local
-  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${path}`; // Construct full URL
-};
+import { useAlert } from "@/app/context/AlertContext";
 
 export default function SavedRecipesPage() {
-  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
+  const { data: session } = useSession();
+  const [savedRecipes, setSavedRecipes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null); // <--- REMOVE LOCAL STATE
   const router = useRouter();
   const [recipeToDelete, setRecipeToDelete] = useState<string | null>(null);
-  const { showAlert } = useAlert(); // <--- INITIALIZE useAlert
+  const { showAlert } = useAlert();
+
+  const fetchSavedRecipes = useCallback(async () => {
+    if (!session?.user) return;
+    setLoading(true);
+    try {
+      const userId = (session.user as any).id;
+      const res = await getSavedRecipes(userId);
+      if (res.success) {
+        setSavedRecipes(res.data || []);
+      }
+    } catch {
+      showAlert("Failed to load saved recipes.", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [session, showAlert]);
 
   useEffect(() => {
-    const fetchSavedRecipes = async () => {
-      try {
-        setLoading(true);
-        // setError(null); // <--- REMOVE
-
-        const { data: sessionData } = await supabase.auth.getSession();
-        const user = sessionData?.session?.user;
-
-        if (!user) {
-          router.push("/login");
-          // It's good practice to show an alert here too, as navigation might not be immediate
-          showAlert("You need to be logged in to view saved recipes.", "error");
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from("saved_recipes")
-          .select(
-            `id, created_at, recipe:recipe_id (recipe_name, description, ingredients, instructions, image_recipe (image_url))`
-          )
-          .eq("user_id", user.id);
-
-        if (error) throw error;
-
-        // Ensure proper type handling for `recipe` and `image_recipe`
-        const formattedRecipes =
-          data?.map((savedRecipe) => {
-            // Supabase "recipe" relation can sometimes return an array or a single object
-            // if recipe_id is a foreign key. Assuming it's a single object for now,
-            // or taking the first element if it's an array.
-            const recipeData = Array.isArray(savedRecipe.recipe)
-              ? savedRecipe.recipe[0]
-              : savedRecipe.recipe;
-
-            // Supabase "image_recipe" relation can also return an array or a single object
-            const imageUrlData = Array.isArray(recipeData?.image_recipe)
-              ? recipeData?.image_recipe[0]
-              : recipeData?.image_recipe;
-
-            return {
-              id: savedRecipe.id,
-              title: recipeData?.recipe_name || "Unknown Recipe",
-              description: recipeData?.description || "No description available",
-              ingredients: recipeData?.ingredients || "No ingredients listed",
-              instructions: recipeData?.instructions || "No instructions provided",
-              created_at: savedRecipe.created_at,
-              image_url: constructImageUrl(imageUrlData?.image_url || null),
-            };
-          }) || [];
-
-        setSavedRecipes(formattedRecipes);
-      } catch (e: unknown) { // Use unknown for caught errors
-        console.error("Error fetching recipes:", e);
-        let errorMessage = "Failed to load saved recipes.";
-        if (e instanceof Error) {
-          errorMessage += `: ${e.message}`;
-        } else if (typeof e === 'string') {
-          errorMessage += `: ${e}`;
-        }
-        // setError("Failed to load saved recipes."); // <--- REPLACE WITH showAlert
-        showAlert(errorMessage, "error");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchSavedRecipes();
-  }, [router, showAlert]); // Add showAlert to dependency array
+  }, [fetchSavedRecipes]);
 
   const handleConfirmDelete = async () => {
-    if (!recipeToDelete) return;
+    if (!recipeToDelete || !session?.user) return;
     try {
-      const { error } = await supabase
-        .from("saved_recipes")
-        .delete()
-        .eq("id", recipeToDelete);
+      const userId = (session.user as any).id;
+      const res = await toggleSaveRecipe(recipeToDelete, userId);
 
-      if (error) throw error;
-
-      setSavedRecipes((prevRecipes) =>
-        prevRecipes.filter((recipe) => recipe.id !== recipeToDelete)
-      );
-      showAlert("Recipe removed from favorites!", "success"); // <--- ADD SUCCESS ALERT
-    } catch (err: unknown) { // Use unknown for caught errors
-      console.error("Error removing recipe:", err);
-      let errorMessage = "Failed to remove recipe.";
-      if (err instanceof Error) {
-        errorMessage += `: ${err.message}`;
-      } else if (typeof err === 'string') {
-        errorMessage += `: ${err}`;
+      if (res.success) {
+        setSavedRecipes((prev) => prev.filter((r) => r.id !== recipeToDelete));
+        showAlert("Removed from favorites!", "success");
+      } else {
+        showAlert(res.error, "error");
       }
-      // setError("Failed to remove recipe."); // <--- REPLACE WITH showAlert
-      showAlert(errorMessage, "error");
+    } catch {
+      showAlert("Failed to remove recipe.", "error");
     } finally {
-      setRecipeToDelete(null); // Always clear the recipe to delete
+      setRecipeToDelete(null);
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: 0.5, staggerChildren: 0.1 },
-    },
-  };
-
-  const recipeCardVariants = {
-    initial: { opacity: 0, y: 20 },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.3, ease: "easeOut" },
-    },
-    hover: { scale: 1.03, transition: { duration: 0.2 } },
-  };
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-orange-500 font-bold">Loading Favorites...</div>;
 
   return (
-    <motion.div
-      className="container mx-auto py-10 px-4 sm:px-6 lg:px-8"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <h1 className="text-3xl font-bold mb-6 text-center text-gray-800 dark:text-white">
-        Saved Recipes
-      </h1>
-
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-pink-50 dark:from-gray-900 py-12 px-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+          <div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent flex items-center gap-3">
+              <Heart className="text-pink-500 fill-current" /> My Saved Kitchen
+            </h1>
+            <p className="text-gray-500 mt-2">All your favorite dishes in one place</p>
+          </div>
+          <button onClick={() => router.back()} className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-md transition text-gray-600 dark:text-gray-300">
+             <ArrowLeft size={18} /> Back to Recipes
+          </button>
         </div>
-      ) : savedRecipes.length === 0 ? ( // No need for `error ?` block here
-        <p className="text-center text-gray-500 dark:text-gray-300">
-          No saved recipes found.
-        </p>
-      ) : (
-        // Responsive Grid with 2 columns on small screens and 3 on larger
-        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {savedRecipes.map((recipe) => (
-            <motion.div
-              key={recipe.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col overflow-hidden"
-              variants={recipeCardVariants}
-              initial="initial"
-              animate="animate"
-              whileHover="hover"
-            >
-              <div className="relative">
-                <Link
-                  href={`/recipes/${recipe.id}/detailspage`}
-                  className="block"
-                >
-                  {recipe.image_url ? (
-                    <Image
-                      src={recipe.image_url || "/placeholder.svg"}
-                      alt={recipe.title}
-                      width={500}
-                      height={200}
-                      className="w-full h-48 object-cover"
-                      priority
-                      unoptimized // Use unoptimized if image is not from Next.js Image Optimization
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center w-full h-48 bg-gray-200">
-                      <p className="text-gray-500">No image available</p>
-                    </div>
-                  )}
-                </Link>
 
-                {/* Delete Button */}
-                <motion.button
-                  onClick={() => setRecipeToDelete(recipe.id)}
-                  className="absolute top-3 right-3 z-10 p-2 rounded-full bg-red-600 text-white hover:bg-red-700 transition-colors duration-200"
-                  aria-label="Delete recipe"
-                  whileHover={{ scale: 1.1, rotate: 15 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Trash2 className="w-5 h-5" />
-                </motion.button>
-              </div>
-
-              <div className="p-6 flex-grow flex flex-col">
-                <div className="flex-grow">
-                  <h3 className="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-100">
-                    {recipe.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                    {recipe.description}
-                  </p>
+        {savedRecipes.length === 0 ? (
+          <div className="text-center py-20 bg-white/50 dark:bg-gray-800/50 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+             <Search size={48} className="mx-auto text-gray-300 mb-4" />
+             <p className="text-xl text-gray-500">Your collection is empty. Start exploring!</p>
+             <Link href="/" className="mt-6 inline-block bg-orange-500 text-white px-8 py-3 rounded-xl font-bold hover:bg-orange-600 transition">Browse Recipes</Link>
+          </div>
+        ) : (
+          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {savedRecipes.map((recipe) => (
+              <motion.div key={recipe.id} className="group bg-white dark:bg-gray-800 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-2xl transition-all" layout>
+                <div className="relative h-56 overflow-hidden">
+                  <Image src={recipe.images?.[0]?.url || "/placeholder.svg"} alt={recipe.title} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <button onClick={() => setRecipeToDelete(recipe.id)} className="absolute top-4 right-4 p-3 bg-white/90 backdrop-blur-md text-red-500 rounded-full shadow-lg hover:bg-red-500 hover:text-white transition-all transform hover:rotate-12">
+                    <Trash2 size={20} />
+                  </button>
                 </div>
-                {/* <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">
-                  Saved on: {new Date(recipe.created_at).toLocaleDateString()}
-                </p> */}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      )}
+                <Link href={`/recipe/${recipe.id}`} className="p-6 block">
+                  <span className="text-xs font-bold text-orange-500 uppercase tracking-widest">{recipe.category?.name || "Recipe"}</span>
+                  <h3 className="text-2xl font-bold mt-2 text-gray-800 dark:text-gray-100 group-hover:text-orange-500 transition-colors">{recipe.title}</h3>
+                  <p className="text-gray-500 mt-2 line-clamp-2">{recipe.description}</p>
+                  <div className="flex items-center gap-2 mt-4 text-sm text-gray-400">
+                    <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold uppercase">{recipe.user?.userName?.[0]}</div>
+                    By {recipe.user?.userName || "Anonymous"}
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
+      </div>
 
-      {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {recipeToDelete && (
-          <motion.div
-            className="fixed inset-0 bg-opacity-50 dark:bg-opacity-70 flex justify-center items-center z-50 p-4" // Added backdrop styling
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-gray-200 dark:border-gray-700"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
-              <div className="text-center">
-                <div className="text-6xl mb-4">🗑️</div>
-                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-                  Delete Favorite Recipe?
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-6">
-                  Are you sure you want to delete this Favorite Recipe? This
-                  action cannot be undone.
-                </p>
-                <div className="flex space-x-3">
-                  <motion.button
-                    onClick={() => setRecipeToDelete(null)}
-                    className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-3 px-4 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Cancel
-                  </motion.button>
-                  <motion.button
-                    onClick={handleConfirmDelete}
-                    className="flex-1 bg-gradient-to-r from-red-500 to-pink-500 text-white py-3 px-4 rounded-xl font-medium hover:from-red-600 hover:to-pink-600 transition-all duration-200"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Delete Recipe
-                  </motion.button>
-                </div>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-md w-full shadow-2xl text-center">
+              <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">💔</div>
+              <h3 className="text-2xl font-bold mb-2">Unsave Recipe?</h3>
+              <p className="text-gray-500 mb-8">This will remove the dish from your favorites collection.</p>
+              <div className="flex gap-4">
+                <button onClick={() => setRecipeToDelete(null)} className="flex-1 py-4 bg-gray-100 dark:bg-gray-700 font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-600 transition">Cancel</button>
+                <button onClick={handleConfirmDelete} className="flex-1 py-4 bg-red-500 text-white font-bold rounded-2xl hover:bg-red-600 transition shadow-lg shadow-red-500/20">Remove</button>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }

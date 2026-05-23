@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/app/lib/supabaseClient";
+import { useSession } from "next-auth/react";
+import { getUserProfile } from "@/app/actions/userActions";
 import { motion } from "framer-motion";
 import {
   User,
@@ -54,59 +55,26 @@ const floatingVariants = {
 
 export default function ProfileAdminPage() {
   const { id } = useParams();
-  const [user, setUser] = useState(null);
+  const { data: session, status } = useSession();
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [name, setName] = useState("");
-  const [aboutMe, setAboutMe] = useState("");
-  const [preview, setPreview] = useState(null);
-  const [activeTab, setActiveTab] = useState("profile");
   const router = useRouter();
-  const [createdAt, setCreatedAt] = useState(null);
 
-  // Get authenticated user
   useEffect(() => {
-    async function getUser() {
-      const { data, error } = await supabase.auth.getUser();
-      if (data?.user && !error) {
-        setUser({
-          id: data.user.id,
-          email: data.user.email ?? "unknown@example.com",
-        });
-      }
-    }
-    getUser();
-  }, []);
-
-  // Fetch profile data from 'users' table
-  useEffect(() => {
-    if (!user) return;
-
     async function fetchProfile() {
+      if (status === "loading") return;
+      if (!id) return;
+
       setLoading(true);
       setError(null);
 
       try {
-        const { data, error } = await supabase
-          .from("users")
-          .select("user_name, about_me, image_url, created_at")
-          .eq("user_id", user.id)
-          .single();
-
-        if (!error && data) {
-          setName(data.user_name || "");
-          setAboutMe(data.about_me || "");
-          setCreatedAt(data.created_at || null);
-          if (data.image_url) {
-            const { data: publicData } = supabase.storage
-              .from("image-user")
-              .getPublicUrl(data.image_url);
-            setPreview(publicData.publicUrl);
-          } else {
-            setPreview(null);
-          }
+        const result = await getUserProfile(id);
+        if (result.success && result.data) {
+          setProfile(result.data);
         } else {
-          console.error("Error fetching profile:", error);
+          console.error("Error fetching profile:", result.error);
           setError(
             `Oops! We couldn't load your profile right now. Let's try again! 😊`
           );
@@ -122,9 +90,9 @@ export default function ProfileAdminPage() {
     }
 
     fetchProfile();
-  }, [user]);
+  }, [id, status]);
 
-  if (loading) {
+  if (loading || status === "loading") {
     return (
       <div className="min-h-screen bg-gradient-to-br from-violet-50 via-pink-50 to-indigo-50 dark:from-gray-900 dark:via-violet-900/20 dark:to-gray-800 flex items-center justify-center">
         <motion.div
@@ -143,16 +111,21 @@ export default function ProfileAdminPage() {
   }
 
   const handleEditClick = () => {
-    if (!id) return; // or fallback
+    if (!id) return;
     router.push(`/admin/${id}/edit-profile`);
   };
 
-  const formattedCreatedAt = createdAt
-    ? new Date(createdAt).toLocaleDateString("en-US", {
+  const formattedCreatedAt = profile?.createdAt
+    ? new Date(profile.createdAt).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
       })
     : "Unknown";
+
+  const name = profile?.userName || "Admin User";
+  const aboutMe = profile?.aboutMe || "";
+  const preview = profile?.imageUrl || null;
+  const email = profile?.email || "unknown@example.com";
 
   return (
     <motion.div
@@ -201,13 +174,14 @@ export default function ProfileAdminPage() {
               variant="outline"
               size="sm"
               className="mt-3 bg-white dark:bg-gray-800 text-red-600 border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30"
+              onClick={() => window.location.reload()}
             >
               Try Again
             </Button>
           </motion.div>
         )}
 
-        {!loading && !error && user && (
+        {!loading && !error && profile && (
           <motion.div
             variants={itemVariants}
             className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full"
@@ -231,10 +205,6 @@ export default function ProfileAdminPage() {
                     <Shield className="h-3 w-3 mr-1" />
                     Admin
                   </span>
-                  {/* <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
-                    <Award className="h-3 w-3 mr-1" />
-                    Verified
-                  </span> */}
                 </div>
               </CardHeader>
 
@@ -262,24 +232,16 @@ export default function ProfileAdminPage() {
                         <User className="h-10 w-10 text-white" />
                       </motion.div>
                     )}
-                    {/* <motion.button
-                      className="absolute bottom-0 right-0 bg-violet-500 hover:bg-violet-600 text-white p-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      title="Update profile picture"
-                    >
-                      <Camera className="h-4 w-4" />
-                    </motion.button> */}
                   </div>
 
                   <h2 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-1.5">
-                    {name || "Admin User"}
+                    {name}
                     <Sparkles className="h-4 w-4 text-yellow-400" />
                   </h2>
 
                   <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm mt-1 mb-4">
                     <Mail className="h-3.5 w-3.5 mr-1.5" />
-                    {user.email}
+                    {email}
                   </div>
 
                   <Button
@@ -298,16 +260,14 @@ export default function ProfileAdminPage() {
                       transition={{ type: "spring", stiffness: 300 }}
                     >
                       <div className="flex items-center">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 text-emerald-500 mr-2" />
-                          <div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
-                              Member Since
-                            </p>
-                            <p className="font-semibold text-gray-800 dark:text-white">
-                              {formattedCreatedAt}
-                            </p>
-                          </div>
+                        <Calendar className="h-4 w-4 text-emerald-500 mr-2" />
+                        <div>
+                          <p className="text-xs text-gray-600 dark:text-gray-400">
+                            Member Since
+                          </p>
+                          <p className="font-semibold text-gray-800 dark:text-white">
+                            {formattedCreatedAt}
+                          </p>
                         </div>
                       </div>
                     </motion.div>
@@ -343,14 +303,6 @@ export default function ProfileAdminPage() {
                       <Heart className="h-4 w-4 mr-2 text-pink-500" />
                       About Me
                     </h3>
-                    {/* <motion.button
-                      className="text-violet-500 hover:text-violet-600 p-1.5 rounded-full hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all duration-200"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      title="Edit about me"
-                    >
-                      <Edit3 className="h-3.5 w-3.5" />
-                    </motion.button> */}
                   </div>
                   <div className="bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-900/10 dark:to-indigo-900/10 p-5 rounded-xl border border-violet-100 dark:border-violet-800/50">
                     <p className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">

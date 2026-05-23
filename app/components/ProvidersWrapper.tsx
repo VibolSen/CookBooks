@@ -1,8 +1,8 @@
-// app/components/ProvidersWrapper.tsx
-"use client"; // This directive is ESSENTIAL here
+"use client";
 
 import React from 'react';
-import { AlertProvider } from '../context/AlertContext'; // Adjust the path if necessary
+import { SessionProvider } from "next-auth/react";
+import { AlertProvider } from '../context/AlertContext';
 
 interface ProvidersWrapperProps {
   children: React.ReactNode;
@@ -10,8 +10,10 @@ interface ProvidersWrapperProps {
 
 export default function ProvidersWrapper({ children }: ProvidersWrapperProps) {
   return (
-    <AlertProvider>
-      {children}
-    </AlertProvider>
+    <SessionProvider>
+      <AlertProvider>
+        {children}
+      </AlertProvider>
+    </SessionProvider>
   );
 }

@@ -1,162 +1,130 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { useSession } from "next-auth/react";
+import { createReview } from "@/app/actions/reviewActions";
 import { motion } from "framer-motion";
 
 interface Review {
-  review_id: number;
-  user_id: string;
-  comment: string;
-  created_at: string;
-  user_name: string;
+  id: string;
+  userId: string;
+  comment: string | null;
+  createdAt: Date;
   rating: number;
+  user?: {
+    userName: string;
+  };
 }
 
 interface CommentSectionProps {
-  recipeId: number;
-  reviews: Review[];
+  recipeId: string;
+  initialReviews: Review[];
 }
 
-const CommentSection: React.FC<CommentSectionProps> = ({ recipeId, reviews }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ recipeId, initialReviews }) => {
+  const { data: session } = useSession();
   const [comment, setComment] = useState("");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [comments, setComments] = useState<Review[]>(reviews);
-  const [username, setUsername] = useState<string | null>(null);
+  const [comments, setComments] = useState<Review[]>(initialReviews);
   const [showAllComments, setShowAllComments] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const getUserIdFromCookies = () => {
-      if (typeof document === "undefined") return null;
-      const cookies = document.cookie.split("; ");
-      const userCookie = cookies.find((cookie) => cookie.startsWith("user="));
-      if (userCookie) {
-        try {
-          const user = JSON.parse(decodeURIComponent(userCookie.split("=")[1]));
-          return user.id;
-        } catch (error) {
-          console.error("Error parsing user cookie:", error);
-        }
-      }
-      return null;
-    };
-
-    const fetchedUserId = getUserIdFromCookies();
-    if (fetchedUserId) {
-      setUserId(fetchedUserId);
-      fetchUsername(fetchedUserId);
-    }
-  }, []);
-
-  const fetchUsername = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("users")
-        .select("user_name")
-        .eq("user_id", userId)
-        .single();
-      if (error) {
-        console.error("Error fetching username:", error);
-      } else {
-        setUsername(data?.user_name || "Unknown User");
-      }
-    } catch (error) {
-      console.error("Error fetching username:", error);
-    }
-  };
-
-  useEffect(() => {
-    setComments(reviews);
-  }, [reviews]);
+    setComments(initialReviews);
+  }, [initialReviews]);
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) {
+    if (!session?.user) {
       alert("You must be logged in to comment.");
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      const { data, error } = await supabase
-        .from("reviews")
-        .insert([{ recipe_id: recipeId, user_id: userId, comment: comment }])
-        .select("*")
-        .single();
+      const userId = (session.user as any).id;
+      const res = await createReview(recipeId, userId, comment);
 
-      if (error) {
-        console.error("Error submitting comment:", error);
-      } else if (data) {
-        console.log("Comment submitted successfully!", data);
+      if (res.success) {
         setComment("");
-        setComments((prevComments) => [...prevComments, data]);
+        // Optimistically add the comment or just let the revalidation handle it if this was a server component
+        // Since we are in client, we manually update for instant feedback
+        setComments((prev) => [res.data as any, ...prev]);
+      } else {
+        alert(res.error);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting comment:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const displayedComments = showAllComments ? comments : comments.slice(0, 1);
+  const displayedComments = showAllComments ? comments : comments.slice(0, 3);
 
   return (
-    <div>
-      <h4 className="font-semibold text-gray-800 dark:text-gray-200">Reviews:</h4>
+    <div className="space-y-6">
+      <h4 className="text-xl font-bold text-gray-800 dark:text-gray-200">Community Reviews</h4>
 
-      <form onSubmit={handleCommentSubmit} className="mt-4">
+      <form onSubmit={handleCommentSubmit} className="space-y-3">
         <textarea
-          className="w-full p-2 border rounded-md text-gray-700 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Add a review..."
+          className="w-full p-4 border rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm dark:border-gray-700 focus:ring-2 focus:ring-orange-500 outline-none transition-all resize-none"
+          placeholder={session?.user ? "Share your thoughts on this recipe..." : "Log in to join the conversation"}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          disabled={!userId}
+          disabled={!session?.user || isSubmitting}
+          rows={3}
         />
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2 focus:outline-none focus:shadow-outline"
-          disabled={!comment.trim()}
-        >
-          Submit
-        </button>
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold py-2 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+            disabled={!comment.trim() || isSubmitting || !session?.user}
+          >
+            {isSubmitting ? "Posting..." : "Post Review"}
+          </button>
+        </div>
       </form>
 
-      {displayedComments.length > 0 ? (
-        displayedComments.map((review) => (
-          <motion.div
-            key={review.review_id ? `${review.review_id}` : Math.random().toString(36).substring(2)}
-            className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+      <div className="space-y-4">
+        {displayedComments.length > 0 ? (
+          displayedComments.map((review) => (
+            <motion.div
+              key={review.id}
+              className="p-5 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <p className="font-bold text-gray-800 dark:text-gray-200">
+                  {review.user?.userName || "Chef"}
+                </p>
+                <div className="flex text-yellow-500">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} className={i < review.rating ? "fill-current" : "text-gray-300"}>★</span>
+                  ))}
+                </div>
+              </div>
+              <p className="text-gray-600 dark:text-gray-400">{review.comment}</p>
+              <p className="text-xs text-gray-400 mt-3 italic">
+                {new Date(review.createdAt).toLocaleDateString()}
+              </p>
+            </motion.div>
+          ))
+        ) : (
+          <div className="text-center py-10 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+             <p className="text-gray-500">No reviews yet. Be the first to try this recipe!</p>
+          </div>
+        )}
+
+        {comments.length > 3 && (
+          <button
+            onClick={() => setShowAllComments(!showAllComments)}
+            className="w-full py-2 text-orange-600 font-medium hover:underline transition-all"
           >
-            <p className="font-semibold text-gray-700 dark:text-gray-300">
-              {review.user_id === userId ? username || "You" : review.user_id}
-            </p>
-            <p className="text-gray-600 dark:text-gray-400">{review.comment}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-500">
-              {review.created_at ? new Date(review.created_at).toLocaleDateString() : "Just now"}
-            </p>
-          </motion.div>
-        ))
-      ) : (
-        <p className="text-gray-500 dark:text-gray-400 mt-2">No reviews yet. Be the first to review!</p>
-      )}
-
-      {comments.length > 1 && !showAllComments && (
-        <button
-          onClick={() => setShowAllComments(true)}
-          className="text-blue-500 hover:underline mt-2"
-        >
-          View all comments
-        </button>
-      )}
-
-      {showAllComments && (
-        <button
-          onClick={() => setShowAllComments(false)}
-          className="text-blue-500 hover:underline mt-2"
-        >
-          Show less
-        </button>
-      )}
+            {showAllComments ? "Show Less" : `View All ${comments.length} Reviews`}
+          </button>
+        )}
+      </div>
     </div>
   );
 };

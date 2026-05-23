@@ -3,13 +3,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { XCircle, Tag } from "lucide-react"; // Import icon
+import { XCircle, Tag } from "lucide-react";
 
 interface CategoryDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   category: {
-    category_id: string;
+    id: string;
     category_name: string;
     image: string;
   } | null;
@@ -36,14 +36,14 @@ const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex justify-center items-center bg-opacity-50"
+      className="fixed inset-0 z-50 flex justify-center items-center bg-black/50"
       variants={backdropVariants}
       initial="hidden"
       animate="visible"
       exit="hidden"
     >
       <motion.div
-        className="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full"
+        className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full"
         variants={modalVariants}
       >
         {/* Header */}
@@ -59,19 +59,19 @@ const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
 
         {/* Content */}
         <div className="text-center">
-          <Image
-            src={category.image || "/default-image.jpg"}
-            alt={category.category_name}
-            width={128}
-            height={128}
-            className="mx-auto rounded-full object-cover w-32 h-32 shadow-md mb-4"
-          />
-          <p className="text-gray-700 dark:text-gray-300 mb-2">
-            <strong className="font-semibold">Name:</strong>{" "}
+          <div className="relative w-32 h-32 mx-auto mb-4">
+            <Image
+              src={category.image || "/placeholder.svg"}
+              alt={category.category_name}
+              fill
+              className="rounded-full object-cover shadow-md"
+            />
+          </div>
+          <p className="text-gray-700 dark:text-gray-300 mb-2 text-lg font-bold">
             {category.category_name}
           </p>
-          <p className="text-gray-700 dark:text-gray-300">
-            <strong className="font-semibold">ID:</strong> {category.category_id}
+          <p className="text-sm text-gray-500 dark:text-gray-400 break-all">
+            ID: {category.id}
           </p>
         </div>
 
@@ -79,7 +79,7 @@ const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
         <div className="flex justify-end mt-8">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded focus:outline-none focus:shadow-outline transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+            className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl focus:outline-none focus:shadow-outline transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           >
             Close
           </button>
