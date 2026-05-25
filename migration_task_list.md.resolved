@@ -1,0 +1,38 @@
+# 📋 Migration Task List
+
+This plan uses a "Copy & Verify" approach to safely move your code without relying on complex terminal rename commands.
+
+## 🟢 Phase 1: Unified Public Routes
+Merge guest and user-viewed pages into a single high-performance group.
+
+- [ ] Create `app/(public)/layout.tsx` (Root visual wrapper)
+- [ ] Migrate `about-us`, `contact-us`, `faq`
+- [ ] Migrate `category` and `occasion` lists
+- [ ] Migrate `popular` list
+- [ ] Migrate `recipe` list
+- [ ] **New**: Migrate `detailspage` to `app/(public)/recipe/[id]/page.tsx`
+- [ ] **New**: Migrate `event-detail` to `app/(public)/event/[id]/page.tsx`
+
+## 🟡 Phase 2: Simplified Auth
+- [ ] Create `app/(auth)` group folder
+- [ ] Migrate `login` page
+- [ ] Migrate `register` page
+
+## 🔵 Phase 3: Secure User Actions
+- [ ] Create `app/(authenticated)` group folder
+- [ ] Migrate `add-recipe` to `app/(authenticated)/add-recipe`
+- [ ] Clean up `/app/profile` routing to use the newer structure
+
+## 🔴 Phase 4: Administrative UI
+- [ ] Flatten `/app/admin/[id]` to `/app/admin`
+- [ ] Update all internal links in Admin views to remove the redundant ID
+
+## ⚙️ Phase 5: Global Integration
+- [ ] Update `@/app/components/Navbar.tsx` paths
+- [ ] Update `@/app/components/Sidebar.tsx` paths
+- [ ] Update `@/app/components/Footer.tsx` paths
+- [ ] Run `npm run build` to verify all imports are correct
+
+---
+> [!TIP]
+> I will execute each phase by reading the existing file and writing it to the new location. Once a phase is complete, we can verify the pages in your browser.

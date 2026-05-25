@@ -10,7 +10,6 @@ import { motion } from "framer-motion";
 import CategoryIcon from "@mui/icons-material/Category";
 
 interface AdminSidebarProps {
-  userId: string | null;
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   sidebarCollapsed: boolean;
@@ -19,7 +18,6 @@ interface AdminSidebarProps {
 }
 
 const AdminSidebar = ({
-  userId,
   sidebarOpen,
   setSidebarOpen,
   sidebarCollapsed,
@@ -32,46 +30,44 @@ const AdminSidebar = ({
     setSidebarCollapsed(!sidebarCollapsed);
   }, [sidebarCollapsed, setSidebarCollapsed]);
 
-  const menuItems = userId
-    ? [
-        {
-          id: "dashboard",
-          href: `/admin/${userId}/dashboard`,
-          label: "Dashboard",
-          icon: "dashboard",
-        },
-        {
-          id: "users",
-          href: `/admin/${userId}/users`,
-          label: "Users",
-          icon: "people",
-        },
-        {
-          id: "categories",
-          href: `/admin/${userId}/categories`,
-          label: "Categories",
-          icon: <CategoryIcon />,
-        },
-        {
-          id: "occasions",
-          href: `/admin/${userId}/occasions`,
-          label: "Occasions",
-          icon: <CategoryIcon />,
-        },
-        {
-          id: "recipes",
-          href: `/admin/${userId}/recipes`,
-          label: "Recipes",
-          icon: "restaurant_menu",
-        },
-        {
-          id: "events",
-          href: `/admin/${userId}/events`,
-          label: "Events",
-          icon: "event",
-        },
-      ]
-    : [];
+  const menuItems = [
+    {
+      id: "dashboard",
+      href: `/admin/dashboard`,
+      label: "Dashboard",
+      icon: "dashboard",
+    },
+    {
+      id: "users",
+      href: `/admin/users`,
+      label: "Users",
+      icon: "people",
+    },
+    {
+      id: "categories",
+      href: `/admin/categories`,
+      label: "Categories",
+      icon: <CategoryIcon />,
+    },
+    {
+      id: "occasions",
+      href: `/admin/occasions`,
+      label: "Occasions",
+      icon: <CategoryIcon />,
+    },
+    {
+      id: "recipes",
+      href: `/admin/recipes`,
+      label: "Recipes",
+      icon: "restaurant_menu",
+    },
+    {
+      id: "events",
+      href: `/admin/events`,
+      label: "Events",
+      icon: "event",
+    },
+  ];
 
   const sidebarVariants = {
     hidden: { x: "-100%" },

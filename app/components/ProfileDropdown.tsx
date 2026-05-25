@@ -13,7 +13,6 @@ export interface ProfileDropdownProps {
   adminName: string | null;
   adminEmail: string | null;
   onLogoutClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  id: string;
   initials: string;
 }
 
@@ -21,7 +20,6 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
   adminImageUrl,
   adminName,
   onLogoutClick,
-  id,
   initials,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -163,7 +161,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
             {/* Menu Items */}
             <div className="py-2">
               <Link
-                href={`/admin/${id}/profile`}
+                href="/admin/profile"
                 onClick={handleLinkClick}
                 className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-200 flex items-center space-x-3 group"
               >
@@ -171,7 +169,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({
                 <span className="font-medium">View Profile</span>
               </Link>
               <Link
-                href={`/admin/${id}/edit-profile`}
+                href="/admin/edit-profile"
                 onClick={handleLinkClick}
                 className="px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 flex items-center space-x-3 group"
               >

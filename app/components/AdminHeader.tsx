@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Menu, Bell } from "lucide-react";
-import { useParams } from "next/navigation";
 import ProfileDropdown from "./ProfileDropdown";
 
 interface Notification {
@@ -48,6 +47,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
   onLogoutClick,
   unreadCount = 0,
   onNotificationsClick = () => {},
+  userId,
 }) => {
   const getInitials = (email: string | null, name: string | null) => {
     if (name) {
@@ -58,9 +58,6 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     const username = email.split("@")[0];
     return username.charAt(0).toUpperCase();
   };
-
-  const { id } = useParams() as { id?: string | string[] };
-  const normalizedId = Array.isArray(id) ? id[0] : id ?? null;
 
   const imageUrl = adminImageUrl?.startsWith("http") ? adminImageUrl : null;
   const initials = getInitials(adminEmail, adminName);
@@ -105,13 +102,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
         </button>
 
         {/* Profile Dropdown */}
-        {normalizedId && (
+        {userId && (
           <ProfileDropdown
             adminImageUrl={imageUrl}
             adminName={adminName}
             adminEmail={adminEmail}
             onLogoutClick={onLogoutClick}
-            id={normalizedId}
             initials={initials}
           />
         )}
