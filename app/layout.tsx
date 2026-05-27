@@ -7,46 +7,46 @@ import ProvidersWrapper from "@/app/components/ProvidersWrapper"; // Import the 
 // Load Inter and Noto Sans Khmer fonts
 const inter = Inter({ subsets: ["latin"] });
 const notoSansKhmer = Noto_Sans_Khmer({
-  subsets: ["khmer"],
-  weight: ["400", "700"],
+ subsets: ["khmer"],
+ weight: ["400", "700"],
 });
 
 // Page metadata (This stays here because layout.tsx is a Server Component)
 export const metadata: Metadata = {
-  title: "Cookbooks",
-  description: "Website description",
-  icons: {
-    icon: "/images/favicon.ico", // Corrected from "/images/favicon.ico"
-  },
+ title: "Cookbooks",
+ description: "Website description",
+ icons: {
+ icon: "/images/favicon.ico", // Corrected from "/images/favicon.ico"
+ },
 };
 
 // Root layout
 export default function RootLayout({
-  children,
+ children,
 }: {
-  children: React.ReactNode;
+ children: React.ReactNode;
 }) {
-  return (
-    <html lang="km" className={notoSansKhmer.className}>
-      <head>
-        {/* Material Icons (optional) */}
-        <link
-          href="https://fonts.googleapis.com/icon?family=Material+Icons"
-          rel="stylesheet"
-        />
-      </head>
-      <body
-        suppressHydrationWarning
-        className={`${inter.className} ${notoSansKhmer.className} antialiased bg-white text-gray-900`}
-      >
-        {/* This div is the target for your alerts rendered via createPortal */}
-        <div id="alert-root"></div>
+ return (
+ <html lang="km" className={notoSansKhmer.className}>
+ <head>
+ {/* Material Icons (optional) */}
+ <link
+ href="https://fonts.googleapis.com/icon?family=Material+Icons"
+ rel="stylesheet"
+ />
+ </head>
+ <body
+ suppressHydrationWarning
+ className={`${inter.className} ${notoSansKhmer.className} antialiased bg-brand-white text-brand-black`}
+ >
+ {/* This div is the target for your alerts rendered via createPortal */}
+ <div id="alert-root"></div>
 
-        {/* Wrap your main application content with the ProvidersWrapper */}
-        <ProvidersWrapper>
-          <main>{children}</main>
-        </ProvidersWrapper>
-      </body>
-    </html>
-  );
+ {/* Wrap your main application content with the ProvidersWrapper */}
+ <ProvidersWrapper>
+ <main>{children}</main>
+ </ProvidersWrapper>
+ </body>
+ </html>
+ );
 }

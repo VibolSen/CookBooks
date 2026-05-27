@@ -42,7 +42,7 @@ export default function BannerSwiper() {
     fetchEvents();
   }, []);
 
-  if (loading) return <div className="h-[400px] bg-gray-900 animate-pulse"></div>;
+  if (loading) return <div className="h-[300px] md:h-[350px] bg-gray-900 animate-pulse"></div>;
 
   return (
     <div className="relative w-full">
@@ -51,7 +51,7 @@ export default function BannerSwiper() {
         effect="fade"
         autoplay={{ delay: 5000 }}
         pagination={{ clickable: true }}
-        className="w-full h-[400px] md:h-[500px]"
+        className="w-full h-[300px] md:h-[350px]"
       >
         {events.map((event) => (
           <SwiperSlide key={event.id}>
@@ -62,8 +62,8 @@ export default function BannerSwiper() {
               />
               <div className="absolute inset-0 bg-black/50" />
               <div className="relative h-full flex flex-col justify-center items-center text-white p-8 text-center">
-                <h1 className="text-4xl md:text-6xl font-bold mb-4">{event.title}</h1>
-                <Link href={`/events/${event.id}`} className="bg-white text-black px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:bg-gray-200 transition">
+                <h1 className="text-3xl md:text-5xl font-bold mb-4">{event.title}</h1>
+                <Link href={`/events/${event.id}`} className="bg-brand-primary text-brand-white px-6 py-2.5 rounded-full font-bold flex items-center gap-2 hover:bg-brand-secondary hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300">
                   Explore Event <ArrowRight className="w-5 h-5" />
                 </Link>
               </div>

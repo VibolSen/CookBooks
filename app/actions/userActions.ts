@@ -43,6 +43,7 @@ export async function updateUser(id: string, data: any) {
         email: data.email,
         imageUrl: data.imageUrl,
         aboutMe: data.aboutMe,
+        role: data.role,
       },
     });
     revalidatePath("/admin/[id]/users");

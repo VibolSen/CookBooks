@@ -19,22 +19,19 @@ export default function HomePage() {
   } : null;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <main className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar user={user} />
-      <div className="w-full">
+      
+      <div className="w-full flex-none">
         <BannerSwiper />
       </div>
-      <main className="container mx-auto px-4 py-6">
-        <section>
-          <NewPost />
-        </section>
-        <section className="mt-8 mb-4">
-          <RecipeoftheWeek />
-        </section>
-        <section>
-          <Popular />
-        </section>
-      </main>
+      
+      <div className="container mx-auto px-4 py-12 flex-1 flex flex-col gap-16">
+        <NewPost />
+        <RecipeoftheWeek />
+        <Popular />
+      </div>
+      
       <Footer />
     </main>
   );

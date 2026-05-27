@@ -2,15 +2,6 @@
 const nextConfig = {
   images: {
     unoptimized: true,
-    domains: [
-      'img.icons8.com',
-      'encrypted-tbn0.gstatic.com',
-      'lh3.googleusercontent.com',   // Google profile photos
-      'avatars.githubusercontent.com', // GitHub
-      'secure.gravatar.com',        // Gravatar
-      'gravatar.com',
-      'res.cloudinary.com',
-    ],
     remotePatterns: [
       {
         protocol: 'https',

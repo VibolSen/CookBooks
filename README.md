@@ -1,4 +1,4 @@
-# 🍳 CookBook
+# CookBook
 
 A premium, modern recipe management platform built with Next.js 15, focusing on a vibrant community of chefs and food enthusiasts.
 
@@ -12,7 +12,7 @@ A premium, modern recipe management platform built with Next.js 15, focusing on 
 - **Icons**: [Lucide React](https://lucide.dev/), [FontAwesome](https://fontawesome.com/)
 - **UI Components**: Radix UI, Material UI (MUI)
 
-## ✨ Key Features
+## Key Features
 
 - **Recipe Discovery**: Browse popular creations and recipes of the week.
 - **Categorization**: filter by diet, occasion, or cuisine.

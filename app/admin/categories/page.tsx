@@ -19,7 +19,6 @@ import {
   Grid3X3,
   List,
   ChefHat,
-  Star,
 } from "lucide-react";
 
 type Category = {
@@ -27,7 +26,6 @@ type Category = {
   category_name: string;
   image: string;
 };
-
 
 export default function CategoriesManagement() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -38,14 +36,33 @@ export default function CategoriesManagement() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string>("");
   const [showCategoryDetailModal, setShowCategoryDetailModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await getCategories();
+      if (!result.success) throw new Error(result.error);
+      
+      // Map Prisma Category model (name, imageUrl) to component data keys (category_name, image)
+      const data = (result.data || []).map((cat: any) => ({
+        id: cat.id,
+        category_name: cat.name,
+        image: cat.imageUrl || "",
+      }));
+      setCategories(data);
+    } catch (err) {
+      setError(`Error fetching categories: ${(err as Error).message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -58,35 +75,19 @@ export default function CategoriesManagement() {
     setFilteredCategories(filtered);
   }, [categories, searchTerm]);
 
-  const fetchCategories = async () => {
-    try {
-      setLoading(true);
-      const result = await getCategories();
-      if (!result.success) throw new Error(result.error);
-      const data = (result.data || []).map((cat: any) => ({
-        id: cat.id,
-        category_name: cat.category_name,
-        image: cat.image || "",
-      }));
-      setCategories(data);
-    } catch (error) {
-      setError(`Error fetching categories: ${(error as Error).message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteCategory = async (id: string) => {
     try {
+      setError(null);
       const result = await deleteCategory(id);
       if (!result.success) throw new Error(result.error);
+      
       setSuccessMessage("Category deleted successfully!");
+      setTimeout(() => setSuccessMessage(null), 3000);
       fetchCategories();
-    } catch (error) {
-      setError(`Error deleting category: ${(error as Error).message}`);
+    } catch (err) {
+      setError(`Error deleting category: ${(err as Error).message}`);
     }
   };
-
 
   const handleDeleteItem = (id: string) => {
     setItemToDelete(id);
@@ -103,435 +104,218 @@ export default function CategoriesManagement() {
     setShowEditCategoryModal(true);
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: 0.6, staggerChildren: 0.1 },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 p-6 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative mb-6">
-            <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <ChefHat className="w-8 h-8 text-blue-500" />
-            </div>
-          </div>
-          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
-            Loading Categories
-          </h3>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Preparing your recipe categories...
-          </p>
-        </div>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-100 border-t-brand-primary rounded-full animate-spin mb-4"></div>
+        <p className="text-gray-500 dark:text-gray-400 font-medium">Loading Categories...</p>
       </div>
     );
   }
 
   return (
-    <motion.div
-      className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900 p-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Header Section */}
-      <motion.div className="mb-8" variants={cardVariants}>
-        <div className="flex items-center gap-4 mb-6">
-          <div className="p-3 bg-gradient-to-r from-emerald-500 to-green-600 rounded-xl shadow-lg">
-            <ChefHat className="w-8 h-8 text-white" />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-blue-50 dark:bg-blue-900/10 text-brand-primary rounded-xl">
+            <ChefHat className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
-            Categories
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Organize and manage your recipe categories
-            </p>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Categories</h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Organize and manage recipe categories.</p>
           </div>
         </div>
+        <button
+          onClick={() => setShowAddCategoryModal(true)}
+          className="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-brand-white text-sm font-semibold rounded-xl transition flex items-center gap-2 shadow-sm"
+        >
+          <Plus className="w-4 h-4" /> Add Category
+        </button>
+      </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <motion.div
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700"
-            variants={itemVariants}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                  Total Categories
-                </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {categories.length}
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl">
-                <Grid3X3 className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700"
-            variants={itemVariants}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                  Most Popular
-                </p>
-                <p className="text-xl font-bold text-gray-900 dark:text-white">
-                  {categories.length > 0
-                    ? categories[0]?.category_name || "N/A"
-                    : "N/A"}
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl">
-                <Star className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* <motion.div
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700"
-            variants={itemVariants}
-            whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                  Growth Rate
-                </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  +12%
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </motion.div> */}
-        </div>
-      </motion.div>
-
-      {/* Search and Controls */}
-      <motion.div
-        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700 mb-8"
-        variants={cardVariants}
-      >
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search categories..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
-            />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-md transition-all duration-200 ${
-                  viewMode === "grid"
-                    ? "bg-white dark:bg-gray-600 shadow-md text-emerald-600"
-                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                }`}
-              >
-                <Grid3X3 className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`p-2 rounded-md transition-all duration-200 ${
-                  viewMode === "list"
-                    ? "bg-white dark:bg-gray-600 shadow-md text-emerald-600"
-                    : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                }`}
-              >
-                <List className="w-5 h-5" />
-              </button>
-            </div>
-
-            <motion.button
-              onClick={() => setShowAddCategoryModal(true)}
-              className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Plus className="w-5 h-5" />
-              Add Category
-            </motion.button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Success/Error Messages */}
+      {/* Success/Error Alerts */}
       <AnimatePresence>
         {successMessage && (
           <motion.div
-            className="fixed top-6 right-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white py-4 px-6 rounded-xl shadow-2xl z-50 flex items-center max-w-md"
-            initial={{ opacity: 0, x: 100, scale: 0.8 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 100, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 p-4 rounded-xl flex items-center gap-3"
           >
-            <CheckCircle className="w-6 h-6 mr-3" />
-            <span className="font-medium">{successMessage}</span>
+            <CheckCircle className="w-5 h-5 shrink-0" />
+            <span className="text-sm font-medium">{successMessage}</span>
           </motion.div>
         )}
 
         {error && (
           <motion.div
-            className="fixed top-6 right-6 bg-gradient-to-r from-red-500 to-pink-500 text-white py-4 px-6 rounded-xl shadow-2xl z-50 flex items-center max-w-md"
-            initial={{ opacity: 0, x: 100, scale: 0.8 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 100, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-800 text-red-600 dark:text-red-400 p-4 rounded-xl flex items-center gap-3"
           >
-            <AlertTriangle className="w-6 h-6 mr-3" />
-            <span className="font-medium">{error}</span>
+            <AlertTriangle className="w-5 h-5 shrink-0" />
+            <span className="text-sm font-medium">{error}</span>
+            <button onClick={() => setError(null)} className="ml-auto text-sm font-bold">Dismiss</button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Categories Display */}
-      <motion.div
-        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden"
-        variants={cardVariants}
-      >
-        {viewMode === "grid" ? (
-          <div className="p-6">
-            {filteredCategories.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredCategories.map((category, index) => (
-                  <motion.div
-                    key={category.id}
-                    className="group bg-gradient-to-br from-gray-50 to-white dark:from-gray-700 dark:to-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-600"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1, duration: 0.5 }}
-                    whileHover={{ y: -5, scale: 1.02 }}
-                  >
-                    <div className="relative mb-4">
-                      <div className="w-20 h-20 mx-auto rounded-2xl overflow-hidden shadow-lg group-hover:shadow-xl transition-shadow duration-300">
-                        <Image
-                          src={
-                            category.image ||
-                            "/placeholder.svg?height=80&width=80"
-                          }
-                          alt={category.category_name}
-                          width={80}
-                          height={80}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <div className="absolute -top-2 -right-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white text-xs px-2 py-1 rounded-full shadow-lg">
-                      #{index + 1}
-                      </div>
-                    </div>
+      {/* Search and Mode Controls */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-4 rounded-2xl shadow-sm flex flex-col sm:flex-row gap-3 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search categories by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary dark:text-white transition duration-200"
+          />
+        </div>
 
-                    <h3 className="font-bold text-gray-800 dark:text-white text-center mb-4 text-lg">
-                      {category.category_name}
-                    </h3>
+        <div className="flex bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-750 rounded-xl p-1 self-stretch sm:self-auto justify-center">
+          <button
+            onClick={() => setViewMode("grid")}
+            className={`p-1.5 rounded-lg transition-all duration-200 flex items-center ${
+              viewMode === "grid"
+                ? "bg-white dark:bg-gray-800 text-brand-primary shadow-sm"
+                : "text-gray-400 hover:text-gray-600"
+            }`}
+          >
+            <Grid3X3 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={`p-1.5 rounded-lg transition-all duration-200 flex items-center ${
+              viewMode === "list"
+                ? "bg-white dark:bg-gray-800 text-brand-primary shadow-sm"
+                : "text-gray-400 hover:text-gray-600"
+            }`}
+          >
+            <List className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
 
-                    <div className="flex justify-center gap-2">
-                      <motion.button
-                        onClick={() => {
-                          setSelectedCategory(category);
-                          setShowCategoryDetailModal(true);
-                        }}
-                        className="p-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all duration-200"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </motion.button>
-                      <motion.button
-                        onClick={() => handleEditCategory(category)}
-                        className="p-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg hover:shadow-lg transition-all duration-200"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </motion.button>
-                      <motion.button
-                        onClick={() =>
-                          handleDeleteItem(category.id)
-                        }
-                        className="p-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all duration-200"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </motion.button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-20">
-                <ChefHat className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                  No categories found
-                </h3>
-                <p className="text-gray-500 dark:text-gray-400 mb-6">
-                  {searchTerm
-                    ? "Try adjusting your search criteria."
-                    : "Get started by adding your first category."}
-                </p>
-                <motion.button
-                  onClick={() => setShowAddCategoryModal(true)}
-                  className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 mx-auto"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+      {/* Categories Content */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden p-6">
+        {filteredCategories.length > 0 ? (
+          viewMode === "grid" ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {filteredCategories.map((category) => (
+                <div
+                  key={category.id}
+                  className="bg-gray-50 dark:bg-gray-900 border border-gray-150 dark:border-gray-750 p-4 rounded-xl flex flex-col items-center justify-between text-center group"
                 >
-                  <Plus className="w-5 h-5" />
-                  Add First Category
-                </motion.button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 border-b border-gray-200 dark:border-gray-600">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    ID
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Category Name
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900 dark:text-white">
-                    Image
-                  </th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                {filteredCategories.length > 0 ? (
-                  filteredCategories.map((category, index) => (
-                    <motion.tr
-                      key={category.id}
-                      className="hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05, duration: 0.3 }}
-                      whileHover={{ scale: 1.01 }}
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
+                    <Image
+                      src={category.image || "/placeholder.svg"}
+                      alt={category.category_name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <h3 className="font-bold text-sm text-gray-800 dark:text-gray-200 mt-3 line-clamp-1">
+                    {category.category_name}
+                  </h3>
+                  <div className="flex gap-1.5 mt-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <button
+                      onClick={() => {
+                        setSelectedCategory(category);
+                        setShowCategoryDetailModal(true);
+                      }}
+                      className="p-1 text-gray-400 hover:text-brand-primary hover:bg-white dark:hover:bg-gray-800 rounded transition border border-transparent hover:border-gray-100"
+                      title="View Details"
                     >
-                      {/* ID */}
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg">
-                          #{index + 1}
-                        </span>
-                      </td>
-
-                      {/* Category Name */}
-                      <td className="px-6 py-4">
-                        <div className="font-semibold text-gray-900 dark:text-white text-lg">
-                          {category.category_name}
-                        </div>
-                      </td>
-
-                      {/* Image */}
-                      <td className="px-6 py-4">
-                        <div className="w-12 h-12 rounded-xl overflow-hidden shadow-md">
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleEditCategory(category)}
+                      className="p-1 text-gray-400 hover:text-brand-primary hover:bg-white dark:hover:bg-gray-800 rounded transition border border-transparent hover:border-gray-100"
+                      title="Edit Category"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteItem(category.id)}
+                      className="p-1 text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-gray-800 rounded transition border border-transparent hover:border-gray-100"
+                      title="Delete Category"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto border border-gray-100 dark:border-gray-750 rounded-xl">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-gray-50/50 dark:bg-gray-700/30 text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700">
+                  <tr>
+                    <th className="px-5 py-3">Image</th>
+                    <th className="px-5 py-3">Category Name</th>
+                    <th className="px-5 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
+                  {filteredCategories.map((category) => (
+                    <tr
+                      key={category.id}
+                      className="hover:bg-gray-50/30 dark:hover:bg-gray-700/10 transition-colors"
+                    >
+                      <td className="px-5 py-2.5">
+                        <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700">
                           <Image
-                            src={
-                              category.image ||
-                              "/placeholder.svg?height=48&width=48"
-                            }
+                            src={category.image || "/placeholder.svg"}
                             alt={category.category_name}
-                            width={48}
-                            height={48}
-                            className="object-cover w-full h-full"
+                            fill
+                            className="object-cover"
                           />
                         </div>
                       </td>
-
-                      {/* Actions */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end space-x-2">
-                          <motion.button
+                      <td className="px-5 py-2.5 font-bold text-gray-800 dark:text-gray-200">
+                        {category.category_name}
+                      </td>
+                      <td className="px-5 py-2.5 text-right">
+                        <div className="inline-flex gap-1.5">
+                          <button
                             onClick={() => {
                               setSelectedCategory(category);
                               setShowCategoryDetailModal(true);
                             }}
-                            className="p-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all duration-200"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            className="p-1.5 text-gray-400 hover:text-brand-primary hover:bg-gray-50 dark:hover:bg-gray-750 rounded-lg transition"
                           >
                             <Eye className="w-4 h-4" />
-                          </motion.button>
-
-                          <motion.button
+                          </button>
+                          <button
                             onClick={() => handleEditCategory(category)}
-                            className="p-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg hover:shadow-lg transition-all duration-200"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            className="p-1.5 text-gray-400 hover:text-brand-primary hover:bg-gray-50 dark:hover:bg-gray-750 rounded-lg transition"
                           >
                             <Edit className="w-4 h-4" />
-                          </motion.button>
-
-                          <motion.button
-                            onClick={() =>
-                              handleDeleteItem(category.id)
-                            }
-                            className="p-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all duration-200"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteItem(category.id)}
+                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-750 rounded-lg transition"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </motion.button>
+                          </button>
                         </div>
                       </td>
-                    </motion.tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={4} className="px-6 py-20 text-center">
-                      <div className="flex flex-col items-center justify-center">
-                        <ChefHat className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                          No categories found
-                        </h3>
-                        <p className="text-gray-500 dark:text-gray-400">
-                          {searchTerm
-                            ? "Try adjusting your search criteria."
-                            : "Get started by adding your first category."}
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        ) : (
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+            <ChefHat className="w-10 h-10 mx-auto mb-2 text-gray-300 dark:text-gray-700" />
+            <p className="text-sm font-medium">No categories found.</p>
           </div>
         )}
-      </motion.div>
+      </div>
 
       {/* Modals */}
       <AddCategoryModal
@@ -556,6 +340,6 @@ export default function CategoriesManagement() {
         onConfirm={handleConfirmDelete}
         itemType="category"
       />
-    </motion.div>
+    </div>
   );
 }

@@ -33,16 +33,16 @@ const PopularPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-indigo-50 dark:from-gray-900 py-16 px-6">
+    <div className="py-8">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-600 rounded-full text-sm font-bold mb-6">
-             <TrendingUp size={16} /> TRENDING NOW
+        <div className="text-center mb-10">
+          <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary/10 text-brand-primary rounded-full text-sm font-bold mb-4">
+            <TrendingUp size={16} /> TRENDING NOW
           </motion.div>
-          <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-orange-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-brand-black mb-4">
             Popular Creations
-          </h1>
-          <p className="text-xl text-gray-500 max-w-2xl mx-auto">Discover what the community is cooking and loving right now.</p>
+          </h2>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">Discover what the community is cooking and loving right now.</p>
         </div>
 
         {loading ? (
@@ -55,8 +55,8 @@ const PopularPage = () => {
           <div className="text-center bg-red-50 text-red-600 p-8 rounded-3xl border border-red-100">{error}</div>
         ) : recipes.length === 0 ? (
           <div className="text-center py-20">
-             <ChefHat size={64} className="mx-auto text-gray-300 mb-4" />
-             <p className="text-gray-500">No popular recipes found yet.</p>
+            <ChefHat size={64} className="mx-auto text-gray-300 mb-4" />
+            <p className="text-gray-500">No popular recipes found yet.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

@@ -21,21 +21,7 @@ export default function NewPostPage() {
         const result = await getNewRecipes();
         if (!result.success) throw new Error(result.error);
 
-        // Map to match RecipeCard expectations if necessary
-        const mapped = (result.data || []).map((r: any) => ({
-          recipe_id: r.id,
-          recipe_name: r.title,
-          description: r.description,
-          image_recipe: r.imageUrl ? [{ image_url: r.imageUrl }] : [],
-          created_at: r.createdAt,
-          // Add default values for other missing fields
-          ingredients: r.ingredients.join("\n"),
-          instructions: r.instructions.join("\n"),
-          prep_time: "0:00:00",
-          cook_time: "0:00:00",
-        }));
-
-        setNewRecipes(mapped);
+        setNewRecipes(result.data || []);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -48,14 +34,14 @@ export default function NewPostPage() {
   return (
     <motion.div className="container mx-auto py-10 px-4">
       <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent mb-4">
+        <h2 className="text-3xl font-bold text-brand-black mb-4">
           Fresh New Recipes
         </h2>
         <p className="text-gray-600">Discover the latest culinary creations!</p>
       </div>
 
       <div className="flex justify-end mb-8">
-        <Link href="/recipe" className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition">
+        <Link href="/recipe" className="bg-brand-primary text-brand-white px-6 py-2 rounded-full font-medium hover:bg-brand-secondary hover:-translate-y-0.5 hover:shadow-md transition-all duration-300">
           View More →
         </Link>
       </div>
@@ -72,7 +58,7 @@ export default function NewPostPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {newRecipes.map((recipe, index) => (
             <RecipeCard
-              key={recipe.recipe_id}
+              key={recipe.id}
               recipe={recipe}
               index={index}
               reviews={[]} // reviews handled inside card or fetched separately

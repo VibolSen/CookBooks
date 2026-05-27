@@ -42,9 +42,9 @@ export default function RecipeOfTheWeekPage() {
     fetchData();
   }, []);
   return (
-    <section className="py-12">
+    <section className="py-8">
       <div className="text-center mb-10">
-        <h2 className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent mb-4">
+        <h2 className="text-3xl font-bold text-brand-black mb-4">
           Recipe of the Week
         </h2>
         <p className="text-gray-600">Handpicked just for you!</p>

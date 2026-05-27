@@ -39,13 +39,13 @@ const AllRecipesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 py-10">
+    <div className="py-8">
       <div className="text-center mb-12">
-        <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 bg-clip-text text-transparent mb-4">
+        <h2 className="text-3xl md:text-4xl font-bold text-brand-black mb-4">
           Explore Our Collection
         </h2>
-        <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          From healthy snacks to gourmet meals, find your next favorite dish here. 👨‍🍳
+        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          From healthy snacks to gourmet meals, find your next favorite dish here.
         </p>
       </div>
 
@@ -55,8 +55,8 @@ const AllRecipesPage = () => {
         </div>
       ) : recipes.length === 0 ? (
         <div className="text-center py-20">
-           <ChefHat className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-           <p className="text-gray-500">No recipes found yet. Check back later!</p>
+          <ChefHat className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+          <p className="text-gray-500">No recipes found yet. Check back later!</p>
         </div>
       ) : (
         <motion.div

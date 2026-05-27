@@ -5,19 +5,14 @@ import { useSession } from "next-auth/react";
 import { getUserProfile, updateUser, uploadUserImage } from "@/app/actions/userActions";
 import ConfirmationModal from "@/app/components/ConfirmationModal";
 import { motion } from "framer-motion";
-import { Mail, ArrowLeft, Camera } from "lucide-react";
+import { Mail, ArrowLeft, Camera, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAlert } from "@/app/context/AlertContext";
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.6, staggerChildren: 0.1 } }
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100, damping: 12 } }
+  visible: { opacity: 1, transition: { duration: 0.4 } }
 };
 
 export default function EditProfile() {
@@ -97,56 +92,109 @@ export default function EditProfile() {
     }
   };
 
-  if (loading && !user) return <div className="min-h-screen flex items-center justify-center"><div className="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div></div>;
-  if (!user) return <div className="text-center py-20">User not found</div>;
+  if (loading && !user) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-100 border-t-brand-primary rounded-full animate-spin mb-4"></div>
+        <p className="text-gray-500 dark:text-gray-400 font-medium">Loading Profile Editor...</p>
+      </div>
+    );
+  }
+  
+  if (!user) return <div className="text-center py-20 text-gray-400">User profile not found.</div>;
 
   return (
-    <motion.div className="min-h-screen bg-gradient-to-br from-violet-50 via-pink-50 to-indigo-50 dark:from-gray-900 py-12 px-6" variants={containerVariants} initial="hidden" animate="visible">
-      <div className="max-w-3xl mx-auto">
-        <button onClick={() => router.back()} className="flex items-center text-gray-600 dark:text-gray-300 mb-8 hover:text-violet-600 transition">
-          <ArrowLeft size={20} className="mr-2" /> Back
-        </button>
+    <motion.div 
+      className="max-w-3xl mx-auto py-6 px-4" 
+      variants={containerVariants} 
+      initial="hidden" 
+      animate="visible"
+    >
+      {/* Back button */}
+      <button 
+        onClick={() => router.back()} 
+        className="flex items-center text-xs font-bold text-gray-500 dark:text-gray-400 mb-6 hover:text-brand-primary transition duration-200"
+      >
+        <ArrowLeft size={16} className="mr-1.5" /> Back to Profile
+      </button>
 
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">Edit Profile</h1>
-          <p className="text-gray-500 mt-2">Personalize your chef profile</p>
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h1>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Personalize your chef details and profile picture.</p>
+      </div>
+
+      {/* Form Card */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm p-6 sm:p-8">
+        
+        {/* Photo Upload */}
+        <div className="flex flex-col items-center mb-8 gap-2">
+          <div className="relative group">
+            <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-gray-100 dark:border-gray-700 shadow-sm">
+              <Image 
+                src={previewUrl || "/default-avatar.png"} 
+                alt="Profile Preview" 
+                fill 
+                className="object-cover" 
+              />
+            </div>
+            <label className="absolute bottom-1 right-1 bg-brand-primary p-2 rounded-xl text-white cursor-pointer shadow-md hover:scale-105 transition-transform duration-200">
+              <Camera size={16} />
+              <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
+            </label>
+          </div>
+          <p className="text-[10px] text-gray-400 dark:text-gray-500">Tap the camera icon to upload a photo</p>
         </div>
 
-        <motion.div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8" variants={itemVariants}>
-          <div className="flex flex-col items-center mb-10">
-            <div className="relative group">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-violet-100 shadow-lg mb-4">
-                <Image src={previewUrl || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
-              </div>
-              <label className="absolute bottom-4 right-0 bg-violet-600 p-2 rounded-full text-white cursor-pointer shadow-lg hover:scale-110 transition">
-                <Camera size={18} />
-                <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
-              </label>
+        {/* Inputs */}
+        <form onSubmit={(e) => { e.preventDefault(); setIsModalOpen(true); }} className="space-y-5">
+          <div>
+            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Display Name</label>
+            <input 
+              ref={nameRef} 
+              defaultValue={user.userName} 
+              required 
+              className="w-full px-4 py-2 text-sm bg-gray-50 border border-gray-250 dark:border-gray-700 dark:bg-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary dark:text-white transition duration-200" 
+            />
+          </div>
+          
+          <div>
+            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Email Address (Read-only)</label>
+            <div className="w-full px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700/50 text-gray-500 dark:text-gray-450 border border-gray-100 dark:border-gray-800 rounded-xl flex items-center gap-2 cursor-not-allowed">
+              <Mail size={16} className="text-gray-400" /> 
+              {user.email}
             </div>
-            <p className="text-sm text-gray-500">Tap the camera to change photo</p>
+          </div>
+          
+          <div>
+            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">About Me</label>
+            <textarea 
+              ref={aboutMeRef} 
+              defaultValue={user.aboutMe || ""} 
+              rows={4} 
+              className="w-full p-4 text-sm bg-gray-50 border border-gray-250 dark:border-gray-700 dark:bg-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary dark:text-white transition duration-200 resize-none" 
+              placeholder="Tell the community about your culinary journey..." 
+            />
           </div>
 
-          <form onSubmit={(e) => { e.preventDefault(); setIsModalOpen(true); }} className="space-y-6">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Display Name</label>
-              <input ref={nameRef} defaultValue={user.userName} required className="w-full p-4 rounded-xl border border-gray-200 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-violet-500 outline-none transition" />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Email (Read-only)</label>
-              <div className="w-full p-4 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-500 border border-gray-100 flex items-center gap-2">
-                <Mail size={18} /> {user.email}
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">About Me</label>
-              <textarea ref={aboutMeRef} defaultValue={user.aboutMe} rows={4} className="w-full p-4 rounded-xl border border-gray-200 dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-violet-500 outline-none transition resize-none" placeholder="Share your cooking story..." />
-            </div>
-
-            <button type="submit" disabled={loading} className="w-full py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all">
-              {loading ? "Updating..." : "Save Changes"}
+          <div className="flex gap-3 pt-2">
+            <button 
+              type="button" 
+              onClick={() => router.back()} 
+              className="flex-1 py-2.5 text-sm font-semibold text-gray-600 dark:text-gray-300 bg-gray-105 dark:bg-gray-750 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition"
+            >
+              Cancel
             </button>
-          </form>
-        </motion.div>
+            <button 
+              type="submit" 
+              disabled={loading} 
+              className="flex-1 py-2.5 bg-brand-primary text-white text-sm font-semibold rounded-xl shadow-sm hover:bg-brand-secondary transition flex items-center justify-center gap-1.5"
+            >
+              <Save size={16} />
+              Save Profile
+            </button>
+          </div>
+        </form>
       </div>
 
       <ConfirmationModal

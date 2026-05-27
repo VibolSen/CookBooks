@@ -15,32 +15,34 @@ import {
   Sparkles,
   Coffee,
   Utensils,
+  Award,
+  ShieldCheck,
 } from "lucide-react";
 
-const AboutUs = () => {
+export default function AboutUs() {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { duration: 0.7, staggerChildren: 0.2 },
+      transition: { duration: 0.7, staggerChildren: 0.15 },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 50 },
+    hidden: { opacity: 0, y: 30 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, type: "spring", stiffness: 50 },
+      transition: { duration: 0.6, ease: "easeOut" },
     },
   };
 
   const floatingVariants = {
     animate: {
-      y: [-10, 10, -10],
-      rotate: [0, 5, -5, 0],
+      y: [-12, 12, -12],
+      rotate: [0, 4, -4, 0],
       transition: {
-        duration: 4,
+        duration: 5,
         repeat: Number.POSITIVE_INFINITY,
         ease: "easeInOut",
       },
@@ -65,7 +67,7 @@ const AboutUs = () => {
       image: "/khouch.png",
       role: "Full-Stack Developer & Food Photographer",
       description:
-        "Combines technical expertise with artistic vision to bring recipes to life&apos;",
+        "Combines technical expertise with artistic vision to bring recipes to life.",
       social: {
         facebook: "https://www.facebook.com/khorn.saokhouch.2025",
         telegram: "https://t.me/khouch04",
@@ -87,134 +89,124 @@ const AboutUs = () => {
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Floating Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+    <div className="min-h-screen w-full relative bg-gray-50/50 dark:bg-gray-950/30">
+      {/* Floating Background Accent Lights */}
+      <div className="absolute top-1/4 left-10 w-72 h-72 rounded-full bg-brand-primary/5 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-10 w-96 h-96 rounded-full bg-[#FF6B00]/5 blur-3xl pointer-events-none" />
+
+      {/* Floating Kitchen Icons */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <motion.div
           variants={floatingVariants}
           animate="animate"
-          className="absolute top-20 left-10 text-green-200 dark:text-green-800"
+          className="absolute top-24 left-12 text-brand-primary/10 dark:text-brand-primary/20"
         >
-          <ChefHat size={40} />
+          <ChefHat size={45} />
         </motion.div>
         <motion.div
           variants={floatingVariants}
           animate="animate"
-          className="absolute top-40 right-20 text-emerald-200 dark:text-emerald-800"
-          style={{ animationDelay: "1s" }}
+          className="absolute top-48 right-24 text-orange-500/10 dark:text-orange-500/20"
+          style={{ animationDelay: "1.5s" }}
         >
-          <Utensils size={35} />
+          <Utensils size={38} />
         </motion.div>
         <motion.div
           variants={floatingVariants}
           animate="animate"
-          className="absolute bottom-40 left-20 text-teal-200 dark:text-teal-800"
-          style={{ animationDelay: "2s" }}
-        >
-          <Coffee size={30} />
-        </motion.div>
-        <motion.div
-          variants={floatingVariants}
-          animate="animate"
-          className="absolute bottom-20 right-10 text-green-200 dark:text-green-800"
+          className="absolute bottom-48 left-16 text-indigo-500/10 dark:text-indigo-500/20"
           style={{ animationDelay: "3s" }}
         >
-          <Heart size={25} />
+          <Coffee size={32} />
+        </motion.div>
+        <motion.div
+          variants={floatingVariants}
+          animate="animate"
+          className="absolute bottom-24 right-16 text-red-500/10 dark:text-red-500/20"
+          style={{ animationDelay: "4.5s" }}
+        >
+          <Heart size={28} />
         </motion.div>
       </div>
 
       <motion.div
-        className="container mx-auto p-6 md:p-8 lg:p-10 relative z-10"
+        className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         {/* Hero Section */}
         <motion.section
-          className="text-center py-20 relative overflow-hidden"
+          className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-white/80 via-white/50 to-gray-50/50 dark:from-gray-900/80 dark:via-gray-900/50 dark:to-gray-950/50 border border-gray-150/40 dark:border-gray-800/50 shadow-xl p-8 md:p-16 lg:p-20 text-center mb-16"
           variants={itemVariants}
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 rounded-3xl opacity-90 dark:opacity-80"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-3xl"></div>
-
-          {/* Decorative Elements */}
-          <div className="absolute top-10 left-10 text-white/30">
-            <Sparkles size={60} />
+          {/* Top Decorative Sparkles */}
+          <div className="absolute top-8 left-8 text-brand-primary/20 animate-pulse">
+            <Sparkles size={48} />
           </div>
-          <div className="absolute bottom-10 right-10 text-white/30">
-            <Star size={50} />
+          <div className="absolute bottom-8 right-8 text-[#FF6B00]/20 animate-pulse">
+            <Star size={36} />
           </div>
 
-          <div className="relative z-10 text-white">
+          <div className="relative z-10">
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 backdrop-blur-sm px-6 py-3 rounded-full text-sm font-medium mb-6 shadow-lg"
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-brand-primary/10 to-indigo-500/10 text-brand-primary dark:text-blue-400 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider mb-6 shadow-sm border border-brand-primary/10"
             >
-              <Heart className="w-4 h-4" />
-              About Our Journey
+              <Heart className="w-3.5 h-3.5 fill-current" />
+              Our Culinary Journey
             </motion.div>
 
             <motion.h1
-              className="text-5xl md:text-7xl font-bold mb-6"
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
+              className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight text-gray-900 dark:text-white"
+              variants={itemVariants}
             >
               Welcome to{" "}
-              <span className="bg-gradient-to-r from-emerald-300 to-green-300 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-brand-primary via-[#7B2CBF] to-[#FF6B00] bg-clip-text text-transparent">
                 CookBook
               </span>
             </motion.h1>
 
             <motion.p
-              className="text-xl md:text-2xl max-w-4xl mx-auto leading-relaxed font-light"
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.8 }}
+              className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed font-normal"
+              variants={itemVariants}
             >
-              Where the joy of cooking meets the art of storytelling! Our
-              passion is simple: we love food, and we believe that every meal
-              tells a story worth sharing.
+              Where the joy of cooking meets the art of community! Our mission is simple: 
+              we love food, and we believe that every meal is an opportunity to create 
+              and share stories that connect us all.
             </motion.p>
 
             <motion.div
-              className="flex justify-center gap-4 mt-8"
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.9, duration: 0.8 }}
+              className="flex flex-wrap justify-center gap-4 mt-10"
+              variants={itemVariants}
             >
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                <Users className="w-5 h-5" />
-                <span className="text-sm font-medium">3 Team Members</span>
+              <div className="flex items-center gap-2.5 bg-white dark:bg-gray-800 border border-gray-150/50 dark:border-gray-700/50 px-5 py-2.5 rounded-full shadow-sm">
+                <Users className="w-5 h-5 text-brand-primary" />
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">3 Visionary Founders</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
-                <ChefHat className="w-5 h-5" />
-                <span className="text-sm font-medium">100+ Recipes</span>
+              <div className="flex items-center gap-2.5 bg-white dark:bg-gray-800 border border-gray-150/50 dark:border-gray-700/50 px-5 py-2.5 rounded-full shadow-sm">
+                <ChefHat className="w-5 h-5 text-orange-500" />
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">100+ Chef Recipes</span>
               </div>
             </motion.div>
           </div>
         </motion.section>
 
         {/* Team Section */}
-        <motion.section className="py-20" variants={itemVariants}>
-          <div className="text-center mb-16">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-medium mb-4 shadow-lg"
-            >
-              <Users className="w-4 h-4" />
+        <motion.section className="py-8" variants={itemVariants}>
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 bg-[#FF6B00]/10 text-[#FF6B00] px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border border-[#FF6B00]/10">
+              <Users className="w-3.5 h-3.5" />
               Meet Our Team
-            </motion.div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-4">
               The Culinary Creators
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              We aim to make cooking accessible and enjoyable for everyone, no
-              matter your skill level or experience.
+            <p className="text-base sm:text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+              Our diverse skills blend together to build a cooking platform that is accessible, 
+              beautiful, and packed with kitchen wisdom.
             </p>
           </div>
 
@@ -224,71 +216,73 @@ const AboutUs = () => {
                 key={member.name}
                 className="group relative"
                 variants={itemVariants}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2, duration: 0.6 }}
-                whileHover={{ y: -10 }}
+                whileHover={{ y: -6 }}
+                transition={{ duration: 0.3 }}
               >
-                <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 relative overflow-hidden">
-                  {/* Background Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                  <div className="relative z-10">
-                    <div className="relative mb-6">
-                      <div className="w-32 h-32 mx-auto relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full animate-pulse"></div>
+                <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md rounded-3xl p-8 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-150/40 dark:border-gray-800/40 relative overflow-hidden flex flex-col justify-between h-full">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-brand-primary/5 to-transparent rounded-bl-[4rem] group-hover:scale-110 transition-transform duration-300" />
+                  
+                  <div>
+                    <div className="relative mb-6 text-center">
+                      <div className="w-28 h-28 mx-auto relative rounded-full p-1 border-2 border-brand-primary/20 dark:border-gray-700">
                         <Image
                           src={member.image || "/placeholder.svg"}
                           alt={member.name}
-                          width={128}
-                          height={128}
-                          className="rounded-full w-full h-full object-cover border-4 border-white dark:border-gray-700 relative z-10"
+                          width={112}
+                          height={112}
+                          className="rounded-full w-full h-full object-cover relative z-10"
                         />
-                        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-2 rounded-full shadow-lg">
-                          <ChefHat className="w-4 h-4" />
+                        <div className="absolute bottom-0 right-1.5 bg-brand-primary text-white p-2 rounded-full shadow-md z-25">
+                          <ChefHat className="w-3.5 h-3.5" />
                         </div>
                       </div>
                     </div>
 
-                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-1">
                       {member.name}
                     </h3>
-                    <p className="text-green-600 dark:text-green-400 font-semibold mb-3">
+                    <p className="text-brand-primary dark:text-blue-450 text-xs font-bold text-center mb-4 uppercase tracking-wider">
                       {member.role}
                     </p>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 leading-relaxed">
+                    <p className="text-gray-500 dark:text-gray-400 text-sm text-center leading-relaxed mb-6">
                       {member.description}
                     </p>
+                  </div>
 
-                    <div className="flex justify-center gap-4">
-                      <motion.a
-                        href={member.social.facebook}
-                        className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        aria-label="Facebook"
-                      >
-                        <Facebook className="w-5 h-5" />
-                      </motion.a>
-                      <motion.a
-                        href={member.social.telegram}
-                        className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        aria-label="Telegram"
-                      >
-                        <Send className="w-5 h-5" />
-                      </motion.a>
-                      <motion.a
-                        href={member.social.github}
-                        className="p-3 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        aria-label="GitHub"
-                      >
-                        <Github className="w-5 h-5" />
-                      </motion.a>
-                    </div>
+                  <div className="flex justify-center gap-3.5 border-t border-gray-100 dark:border-gray-800 pt-4">
+                    <motion.a
+                      href={member.social.facebook}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2.5 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-450 hover:bg-brand-primary hover:text-white dark:hover:bg-brand-primary rounded-xl transition-all duration-300 shadow-sm border border-gray-100 dark:border-gray-700"
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.95 }}
+                      aria-label="Facebook"
+                    >
+                      <Facebook className="w-4 h-4" />
+                    </motion.a>
+                    <motion.a
+                      href={member.social.telegram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2.5 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-450 hover:bg-[#0088cc] hover:text-white dark:hover:bg-[#0088cc] rounded-xl transition-all duration-300 shadow-sm border border-gray-100 dark:border-gray-700"
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.95 }}
+                      aria-label="Telegram"
+                    >
+                      <Send className="w-4 h-4" />
+                    </motion.a>
+                    <motion.a
+                      href={member.social.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2.5 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-450 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-black rounded-xl transition-all duration-300 shadow-sm border border-gray-100 dark:border-gray-700"
+                      whileHover={{ scale: 1.08 }}
+                      whileTap={{ scale: 0.95 }}
+                      aria-label="GitHub"
+                    >
+                      <Github className="w-4 h-4" />
+                    </motion.a>
                   </div>
                 </div>
               </motion.div>
@@ -296,124 +290,73 @@ const AboutUs = () => {
           </div>
         </motion.section>
 
-        {/* Vision Section */}
+        {/* Vision & Values Section */}
         <motion.section
-          className="py-20"
+          className="py-16"
           variants={itemVariants}
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
         >
-          <div className="bg-gradient-to-r from-green-100 via-emerald-100 to-teal-100 dark:from-green-900/30 dark:via-emerald-900/30 dark:to-teal-900/30 rounded-3xl p-12 relative overflow-hidden">
+          <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-[2.5rem] border border-gray-150/40 dark:border-gray-800/40 p-8 md:p-12 lg:p-16 relative overflow-hidden shadow-xl">
             {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none">
               <div className="absolute top-10 left-10">
-                <Utensils size={100} className="text-green-400" />
+                <Utensils size={120} className="text-gray-400" />
               </div>
               <div className="absolute bottom-10 right-10">
-                <ChefHat size={120} className="text-teal-400" />
+                <ChefHat size={140} className="text-gray-400" />
               </div>
             </div>
 
             <div className="relative z-10 max-w-4xl mx-auto text-center">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-full text-sm font-medium mb-6 shadow-lg"
-              >
-                <Target className="w-4 h-4" />
-                Our Vision
-              </motion.div>
-
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-6">
-                Cooking for Everyone, Everywhere
-              </h2>
-
-              <p className="text-lg text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-                <strong>What drives us forward?</strong>
-              </p>
-
-              <p className="text-xl text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                Our team is made up of food enthusiasts, recipe developers, and
-                culinary storytellers. We are committed to testing and refining
-                every recipe, so you can be confident that when you cook with
-                us, you&apos;re making something truly special.
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Heart className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="font-bold text-gray-800 dark:text-white mb-2">
-                    Passion
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Every recipe is crafted with love and tested with care
-                  </p>
-                </div>
-                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="font-bold text-gray-800 dark:text-white mb-2">
-                    Community
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Building connections through shared culinary experiences
-                  </p>
-                </div>
-                <div className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
-                  <h3 className="font-bold text-gray-800 dark:text-white mb-2">
-                    Innovation
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Constantly evolving to bring you the best cooking experience
-                  </p>
-                </div>
+              <div className="inline-flex items-center gap-2 bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider mb-6 border border-indigo-500/10">
+                <Target className="w-3.5 h-3.5" />
+                Our Core Values
               </div>
 
-              <div className="flex justify-center gap-4">
-                <motion.a
-                  href="#"
-                  className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Telegram"
-                >
-                  <Send className="w-6 h-6" />
-                </motion.a>
-                <motion.a
-                  href="#"
-                  className="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg"
-                  whileHover={{ scale: 1.1, rotate: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Facebook"
-                >
-                  <Facebook className="w-6 h-6" />
-                </motion.a>
-                <motion.a
-                  href="#"
-                  className="p-4 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-300"
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="GitHub"
-                >
-                  <Github className="w-6 h-6" />
-                </motion.a>
-                <motion.a
-                  href="#"
-                  className="p-4 bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400 rounded-full hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-300"
-                  whileHover={{ scale: 1.1, rotate: -5 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="YouTube"
-                >
-                  <Youtube className="w-6 h-6" />
-                </motion.a>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-6">
+                Guiding Every Plate we Create
+              </h2>
+
+              <p className="text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-12 leading-relaxed">
+                We believe that recipes aren&apos;t just instructions—they are dynamic acts of design, 
+                testing, and sharing. Here are the core pillars that guide our curation.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 text-left">
+                <div className="bg-gray-50/80 dark:bg-gray-800/40 border border-gray-150/30 dark:border-gray-800/30 rounded-2xl p-6 shadow-sm">
+                  <div className="w-10 h-10 bg-brand-primary/10 rounded-xl flex items-center justify-center mb-4 border border-brand-primary/10">
+                    <Heart className="w-5 h-5 text-brand-primary" />
+                  </div>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-base mb-2">
+                    Genuine Passion
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    Every dish listed is verified, cooked, and evaluated to guarantee outstanding culinary results.
+                  </p>
+                </div>
+
+                <div className="bg-gray-50/80 dark:bg-gray-800/40 border border-gray-150/30 dark:border-gray-800/30 rounded-2xl p-6 shadow-sm">
+                  <div className="w-10 h-10 bg-indigo-500/10 rounded-xl flex items-center justify-center mb-4 border border-indigo-500/10">
+                    <Award className="w-5 h-5 text-indigo-500" />
+                  </div>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-base mb-2">
+                    Quality First
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    From measurements to step-by-step photography, we prioritize accuracy for chef and home cook alike.
+                  </p>
+                </div>
+
+                <div className="bg-gray-50/80 dark:bg-gray-800/40 border border-gray-150/30 dark:border-gray-800/30 rounded-2xl p-6 shadow-sm">
+                  <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-4 border border-emerald-500/10">
+                    <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                  </div>
+                  <h3 className="font-bold text-gray-900 dark:text-white text-base mb-2">
+                    Inclusive Craft
+                  </h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                    Catering to all skill levels with clear labels, dietary categories, and detailed annotations.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -421,28 +364,28 @@ const AboutUs = () => {
 
         {/* Call to Action */}
         <motion.section
-          className="text-center py-16"
+          className="text-center py-8"
           variants={itemVariants}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
         >
-          <div className="bg-gradient-to-r from-green-500 to-teal-500 rounded-3xl p-12 text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-black/10"></div>
-            <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Ready to Start Cooking?
+          <div className="bg-gradient-to-br from-brand-primary via-brand-secondary to-indigo-900 rounded-[2.5rem] p-12 text-white relative overflow-hidden shadow-lg shadow-blue-500/10">
+            <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
+            <div className="absolute -top-12 -right-12 w-64 h-64 bg-white/5 rounded-full blur-2xl" />
+
+            <div className="relative z-10 max-w-2xl mx-auto">
+              <h2 className="text-3xl md:text-4xl font-extrabold mb-4 tracking-tight">
+                Ready to Spark Your Inner Chef?
               </h2>
-              <p className="text-xl mb-8 opacity-90">
-                Join our community and discover amazing recipes today!
+              <p className="text-base md:text-lg mb-8 text-blue-100 font-light max-w-lg mx-auto">
+                Explore hundreds of user-submitted and expert-curated recipes, and join the conversation today!
               </p>
               <motion.button
-                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-300 inline-flex items-center gap-2 shadow-lg"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                onClick={() => window.location.href = "/recipe"}
+                className="bg-white text-brand-primary hover:text-brand-secondary px-8 py-4 rounded-xl font-bold text-sm inline-flex items-center gap-2.5 transition-all duration-300 shadow-lg shadow-black/10 cursor-pointer"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.98 }}
               >
-                <ChefHat className="w-5 h-5" />
-                Explore Recipes
+                <ChefHat className="w-4 h-4" />
+                Explore Our Recipes
               </motion.button>
             </div>
           </div>
@@ -450,6 +393,4 @@ const AboutUs = () => {
       </motion.div>
     </div>
   );
-};
-
-export default AboutUs;
+}

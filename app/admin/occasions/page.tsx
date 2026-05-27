@@ -7,7 +7,7 @@ import AddOccasionModal from "@/app/components/AddOccasionModal";
 import EditOccasionModal from "@/app/components/EditOccasionModal";
 import DeleteConfirmationModal from "@/app/components/DeleteConfirmationModal";
 import OccasionDetailModal from "@/app/components/OccasionDetailModal";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
   Edit,
@@ -16,8 +16,9 @@ import {
   Search,
   Grid3X3,
   List,
-  Calendar,
-  PartyPopper,
+  CalendarRange,
+  CheckCircle,
+  AlertTriangle,
 } from "lucide-react";
 
 interface Occasion {
@@ -37,14 +38,36 @@ export default function OccasionManagement() {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string>("");
   const [showOccasionDetailModal, setShowOccasionDetailModal] = useState(false);
-  const [selectedOccasion, setSelectedOccasion] = useState<Occasion | null>(
-    null
-  );
+  const [selectedOccasion, setSelectedOccasion] = useState<Occasion | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [loading, setLoading] = useState(true);
+
+  const fetchOccasions = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await getOccasions();
+      if (!result.success) throw new Error(result.error);
+      
+      // Map Prisma Occasion (imageUrl) to component key (occasion_image).
+      // Prisma schema has no Category relation for Occasions, so we ignore relations.
+      const data = (result.data || []).map((occ: any) => ({
+        id: occ.id,
+        name: occ.name,
+        occasion_image: occ.imageUrl || "",
+        categoryId: "",
+        category: null,
+      }));
+      setOccasions(data);
+    } catch (err: any) {
+      setError(err.message || "Error fetching occasions");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchOccasions();
@@ -64,36 +87,17 @@ export default function OccasionManagement() {
     filterOccasions();
   }, [filterOccasions]);
 
-  const fetchOccasions = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const result = await getOccasions();
-      if (!result.success) throw new Error(result.error);
-      const data = (result.data || []).map((occ: any) => ({
-        id: occ.id,
-        name: occ.name,
-        occasion_image: occ.occasion_image || "",
-        categoryId: occ.categoryId,
-        category: occ.category ? { category_name: occ.category.category_name } : null,
-      }));
-      setOccasions(data);
-    } catch (err: any) {
-      setError(err.message || "Error fetching occasions");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDeleteOccasion = async (id: string) => {
     try {
+      setError(null);
       const result = await deleteOccasion(id);
       if (!result.success) throw new Error(result.error);
+      
       setSuccessMessage("Occasion deleted successfully!");
+      setTimeout(() => setSuccessMessage(null), 3000);
       fetchOccasions();
-    } catch (error: any) {
-      setError(`Error deleting occasion: ${error.message}`);
+    } catch (err: any) {
+      setError(`Error deleting occasion: ${err.message}`);
     }
   };
 
@@ -112,193 +116,242 @@ export default function OccasionManagement() {
     setShowEditOccasionModal(true);
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: 0.6, staggerChildren: 0.1 },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900 p-6 flex items-center justify-center">
-        <div className="text-center">
-          <div className="relative mb-6">
-            <div className="w-20 h-20 border-4 border-purple-200 border-t-purple-500 rounded-full animate-spin"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <PartyPopper className="w-8 h-8 text-purple-500" />
-            </div>
-          </div>
-          <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">
-            Loading Occasions
-          </h3>
-        </div>
+      <div className="min-h-[70vh] flex flex-col items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-100 border-t-brand-primary rounded-full animate-spin mb-4"></div>
+        <p className="text-gray-500 dark:text-gray-400 font-medium">Loading Occasions...</p>
       </div>
     );
   }
 
   return (
-    <motion.div
-      className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900 p-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
+    <div className="max-w-7xl mx-auto space-y-6">
       {/* Header Section */}
-      <motion.div className="mb-8" variants={cardVariants}>
-        <div className="flex items-center gap-4 mb-6">
-          <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl shadow-lg">
-            <PartyPopper className="w-8 h-8 text-white" />
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-6 rounded-2xl shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-blue-50 dark:bg-blue-900/10 text-brand-primary rounded-xl">
+            <CalendarRange className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Occasions
-            </h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Occasions</h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Manage dietary themes and special event occasions.</p>
           </div>
         </div>
+        <button
+          onClick={() => setShowAddOccasionModal(true)}
+          className="px-4 py-2 bg-brand-primary hover:bg-brand-secondary text-brand-white text-sm font-semibold rounded-xl transition flex items-center gap-2 shadow-sm"
+        >
+          <Plus className="w-4 h-4" /> Add Occasion
+        </button>
+      </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <motion.div
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700"
-            variants={itemVariants}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                  Total Occasions
-                </p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  {occasions.length}
-                </p>
-              </div>
-              <div className="p-3 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl">
-                <Calendar className="w-6 h-6 text-white" />
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Success/Error Messages */}
-      <div className="fixed top-6 right-6 z-50 flex flex-col gap-4">
+      {/* Success/Error Alerts */}
+      <AnimatePresence>
         {successMessage && (
-          <div className="bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
-            <span>{successMessage}</span>
-            <button onClick={() => setSuccessMessage(null)}>×</button>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 p-4 rounded-xl flex items-center gap-3"
+          >
+            <CheckCircle className="w-5 h-5 shrink-0" />
+            <span className="text-sm font-medium">{successMessage}</span>
+          </motion.div>
         )}
+
         {error && (
-          <div className="bg-red-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3">
-            <span>{error}</span>
-            <button onClick={() => setError(null)}>×</button>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-800 text-red-600 dark:text-red-400 p-4 rounded-xl flex items-center gap-3"
+          >
+            <AlertTriangle className="w-5 h-5 shrink-0" />
+            <span className="text-sm font-medium">{error}</span>
+            <button onClick={() => setError(null)} className="ml-auto text-sm font-bold">Dismiss</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Search and Mode Controls */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 p-4 rounded-2xl shadow-sm flex flex-col sm:flex-row gap-3 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search occasions by name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary dark:text-white transition duration-200"
+          />
+        </div>
+
+        <div className="flex bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-750 rounded-xl p-1 self-stretch sm:self-auto justify-center">
+          <button
+            onClick={() => setViewMode("grid")}
+            className={`p-1.5 rounded-lg transition-all duration-200 flex items-center ${
+              viewMode === "grid"
+                ? "bg-white dark:bg-gray-800 text-brand-primary shadow-sm"
+                : "text-gray-400 hover:text-gray-600"
+            }`}
+          >
+            <Grid3X3 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setViewMode("list")}
+            className={`p-1.5 rounded-lg transition-all duration-200 flex items-center ${
+              viewMode === "list"
+                ? "bg-white dark:bg-gray-800 text-brand-primary shadow-sm"
+                : "text-gray-400 hover:text-gray-600"
+            }`}
+          >
+            <List className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Occasions Display */}
+      <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden p-6">
+        {filteredOccasions.length > 0 ? (
+          viewMode === "grid" ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {filteredOccasions.map((occasion) => (
+                <div
+                  key={occasion.id}
+                  className="bg-gray-50 dark:bg-gray-900 border border-gray-155 dark:border-gray-755 p-4 rounded-xl flex flex-col items-center justify-between text-center group"
+                >
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 shrink-0">
+                    <Image
+                      src={occasion.occasion_image || "/placeholder.svg"}
+                      alt={occasion.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <h3 className="font-bold text-sm text-gray-800 dark:text-gray-200 mt-3 line-clamp-1">
+                    {occasion.name}
+                  </h3>
+                  <div className="flex gap-1.5 mt-4 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <button
+                      onClick={() => {
+                        setSelectedOccasion(occasion);
+                        setShowOccasionDetailModal(true);
+                      }}
+                      className="p-1 text-gray-400 hover:text-brand-primary hover:bg-white dark:hover:bg-gray-800 rounded transition border border-transparent hover:border-gray-100"
+                      title="View Details"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleEditOccasion(occasion)}
+                      className="p-1 text-gray-400 hover:text-brand-primary hover:bg-white dark:hover:bg-gray-800 rounded transition border border-transparent hover:border-gray-100"
+                      title="Edit Occasion"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteItem(occasion.id)}
+                      className="p-1 text-gray-400 hover:text-red-500 hover:bg-white dark:hover:bg-gray-800 rounded transition border border-transparent hover:border-gray-100"
+                      title="Delete Occasion"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="overflow-x-auto border border-gray-100 dark:border-gray-750 rounded-xl">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-gray-50/50 dark:bg-gray-700/30 text-xs font-bold text-gray-400 uppercase border-b border-gray-100 dark:border-gray-700">
+                  <tr>
+                    <th className="px-5 py-3">Image</th>
+                    <th className="px-5 py-3">Occasion Name</th>
+                    <th className="px-5 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
+                  {filteredOccasions.map((occasion) => (
+                    <tr
+                      key={occasion.id}
+                      className="hover:bg-gray-50/30 dark:hover:bg-gray-700/10 transition-colors"
+                    >
+                      <td className="px-5 py-2.5">
+                        <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700">
+                          <Image
+                            src={occasion.occasion_image || "/placeholder.svg"}
+                            alt={occasion.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      </td>
+                      <td className="px-5 py-2.5 font-bold text-gray-800 dark:text-gray-200">
+                        {occasion.name}
+                      </td>
+                      <td className="px-5 py-2.5 text-right">
+                        <div className="inline-flex gap-1.5">
+                          <button
+                            onClick={() => {
+                              setSelectedOccasion(occasion);
+                              setShowOccasionDetailModal(true);
+                            }}
+                            className="p-1.5 text-gray-400 hover:text-brand-primary hover:bg-gray-50 dark:hover:bg-gray-750 rounded-lg transition"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleEditOccasion(occasion)}
+                            className="p-1.5 text-gray-400 hover:text-brand-primary hover:bg-gray-50 dark:hover:bg-gray-750 rounded-lg transition"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteItem(occasion.id)}
+                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-gray-750 rounded-lg transition"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        ) : (
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500">
+            <CalendarRange className="w-10 h-10 mx-auto mb-2 text-gray-300 dark:text-gray-700" />
+            <p className="text-sm font-medium">No occasions found.</p>
           </div>
         )}
       </div>
 
-      {/* Search and Controls */}
-      <motion.div
-        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-100 dark:border-gray-700 mb-8"
-        variants={cardVariants}
-      >
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search occasions..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white transition-all duration-200"
-            />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-              <button onClick={() => setViewMode("grid")} className={`p-2 rounded-md ${viewMode === "grid" ? "bg-white text-purple-600" : "text-gray-500"}`}><Grid3X3 className="w-5 h-5"/></button>
-              <button onClick={() => setViewMode("list")} className={`p-2 rounded-md ${viewMode === "list" ? "bg-white text-purple-600" : "text-gray-500"}`}><List className="w-5 h-5"/></button>
-            </div>
-
-            <button
-              onClick={() => setShowAddOccasionModal(true)}
-              className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              Add Occasion
-            </button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Occasions Display */}
-      <motion.div
-        className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-700 overflow-hidden"
-        variants={cardVariants}
-      >
-        {viewMode === "grid" ? (
-          <div className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredOccasions.map((occasion) => (
-                <div key={occasion.id} className="bg-gray-50 dark:bg-gray-700 p-4 rounded-xl shadow-md">
-                   <div className="relative w-full h-40 mb-4 bg-gray-200 rounded-lg overflow-hidden">
-                      <Image src={occasion.occasion_image || "/placeholder.svg"} alt={occasion.name} fill className="object-cover" />
-                   </div>
-                   <h3 className="font-bold text-center">{occasion.name}</h3>
-                   <div className="flex justify-center gap-2 mt-4">
-                      <button onClick={() => { setSelectedOccasion(occasion); setShowOccasionDetailModal(true); }} className="p-2 bg-blue-500 text-white rounded-lg"><Eye className="w-4 h-4"/></button>
-                      <button onClick={() => handleEditOccasion(occasion)} className="p-2 bg-amber-500 text-white rounded-lg"><Edit className="w-4 h-4"/></button>
-                      <button onClick={() => handleDeleteItem(occasion.id)} className="p-2 bg-red-500 text-white rounded-lg"><Trash2 className="w-4 h-4"/></button>
-                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-gray-100 dark:bg-gray-700 uppercase text-xs font-bold text-gray-500">
-                  <th className="px-6 py-4">Name</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOccasions.map((occasion) => (
-                  <tr key={occasion.id} className="border-b dark:border-gray-600">
-                    <td className="px-6 py-4 font-bold">{occasion.name}</td>
-                    <td className="px-6 py-4">{occasion.category?.category_name}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <button onClick={() => { setSelectedOccasion(occasion); setShowOccasionDetailModal(true); }} className="p-2 bg-blue-500 text-white rounded-lg"><Eye className="w-4 h-4"/></button>
-                        <button onClick={() => handleEditOccasion(occasion)} className="p-2 bg-amber-500 text-white rounded-lg"><Edit className="w-4 h-4"/></button>
-                        <button onClick={() => handleDeleteItem(occasion.id)} className="p-2 bg-red-500 text-white rounded-lg"><Trash2 className="w-4 h-4"/></button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </motion.div>
-
       {/* Modals */}
-      <AddOccasionModal isOpen={showAddOccasionModal} onClose={() => setShowAddOccasionModal(false)} onOccasionAdded={fetchOccasions} />
-      <EditOccasionModal isOpen={showEditOccasionModal} onClose={() => setShowEditOccasionModal(false)} occasion={currentOccasion} onOccasionUpdated={fetchOccasions} />
-      <OccasionDetailModal isOpen={showOccasionDetailModal} onClose={() => setShowOccasionDetailModal(false)} occasion={selectedOccasion} />
-      <DeleteConfirmationModal isOpen={showDeleteConfirmation} onClose={() => setShowDeleteConfirmation(false)} onConfirm={handleConfirmDelete} itemType="occasion" />
-    </motion.div>
+      <AddOccasionModal
+        isOpen={showAddOccasionModal}
+        onClose={() => setShowAddOccasionModal(false)}
+        onOccasionAdded={fetchOccasions}
+      />
+      <EditOccasionModal
+        isOpen={showEditOccasionModal}
+        onClose={() => setShowEditOccasionModal(false)}
+        occasion={currentOccasion}
+        onOccasionUpdated={fetchOccasions}
+      />
+      <OccasionDetailModal
+        isOpen={showOccasionDetailModal}
+        onClose={() => setShowOccasionDetailModal(false)}
+        occasion={selectedOccasion}
+      />
+      <DeleteConfirmationModal
+        isOpen={showDeleteConfirmation}
+        onClose={() => setShowDeleteConfirmation(false)}
+        onConfirm={handleConfirmDelete}
+        itemType="occasion"
+      />
+    </div>
   );
 }

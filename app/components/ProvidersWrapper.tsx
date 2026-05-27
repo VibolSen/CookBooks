@@ -5,15 +5,15 @@ import { SessionProvider } from "next-auth/react";
 import { AlertProvider } from '../context/AlertContext';
 
 interface ProvidersWrapperProps {
-  children: React.ReactNode;
+ children: React.ReactNode;
 }
 
 export default function ProvidersWrapper({ children }: ProvidersWrapperProps) {
-  return (
-    <SessionProvider>
-      <AlertProvider>
-        {children}
-      </AlertProvider>
-    </SessionProvider>
-  );
+ return (
+ <SessionProvider>
+ <AlertProvider>
+ {children}
+ </AlertProvider>
+ </SessionProvider>
+ );
 }

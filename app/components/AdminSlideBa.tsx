@@ -5,9 +5,17 @@ import { useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { 
+  ChevronLeft, 
+  ChevronRight,
+  LayoutDashboard, 
+  Users, 
+  ChefHat, 
+  CalendarRange, 
+  BookOpen, 
+  Calendar 
+} from "lucide-react";
 import { motion } from "framer-motion";
-import CategoryIcon from "@mui/icons-material/Category";
 
 interface AdminSidebarProps {
   sidebarOpen: boolean;
@@ -33,39 +41,39 @@ const AdminSidebar = ({
   const menuItems = [
     {
       id: "dashboard",
-      href: `/admin/dashboard`,
+      href: "/admin/dashboard",
       label: "Dashboard",
-      icon: "dashboard",
+      icon: LayoutDashboard,
     },
     {
       id: "users",
-      href: `/admin/users`,
+      href: "/admin/users",
       label: "Users",
-      icon: "people",
+      icon: Users,
     },
     {
       id: "categories",
-      href: `/admin/categories`,
+      href: "/admin/categories",
       label: "Categories",
-      icon: <CategoryIcon />,
+      icon: ChefHat,
     },
     {
       id: "occasions",
-      href: `/admin/occasions`,
+      href: "/admin/occasions",
       label: "Occasions",
-      icon: <CategoryIcon />,
+      icon: CalendarRange,
     },
     {
       id: "recipes",
-      href: `/admin/recipes`,
+      href: "/admin/recipes",
       label: "Recipes",
-      icon: "restaurant_menu",
+      icon: BookOpen,
     },
     {
       id: "events",
-      href: `/admin/events`,
+      href: "/admin/events",
       label: "Events",
-      icon: "event",
+      icon: Calendar,
     },
   ];
 
@@ -75,12 +83,12 @@ const AdminSidebar = ({
   };
 
   const menuItemVariants = {
-    hidden: { opacity: 0, x: -20 },
+    hidden: { opacity: 0, x: -10 },
     visible: {
       opacity: 1,
       x: 0,
       transition: {
-        duration: 0.3,
+        duration: 0.2,
         ease: "easeOut",
       },
     },
@@ -88,119 +96,100 @@ const AdminSidebar = ({
 
   return (
     <motion.aside
-      className={`bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 shadow-lg h-screen z-40 transform transition-all duration-300 ease-in-out ${
+      className={`bg-white dark:bg-gray-800 h-screen z-40 transform transition-all duration-300 ease-in-out ${
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       } ${
         sidebarCollapsed ? "w-20" : "w-64"
-      } fixed md:relative md:translate-x-0 border-r border-gray-200 dark:border-gray-700 flex flex-col`}
+      } fixed md:relative md:translate-x-0 border-r border-gray-100 dark:border-gray-700 flex flex-col`}
       variants={sidebarVariants}
     >
       {/* Logo and Toggle Section */}
-      <div className="relative">
+      <div className="relative flex items-center justify-between p-4 min-h-[80px]">
         {/* Logo Container */}
-        <div
-          className={`flex items-center justify-center py-6 ${
-            sidebarCollapsed ? "px-2" : "px-4"
-          }`}
-        >
-          <Link href="/" className="flex items-center justify-center relative">
-            <div
-              className={`transition-all duration-300 ${
-                sidebarCollapsed ? "scale-75" : ""
-              }`}
-            >
-            <Image
-  src="/logo.png"
-  alt="CookBook Logo"
-  width={90}
-  height={90}
-  style={{ width: "80px", height: "auto" }}
-  className="transition-all duration-300"
-/>
-
-
+        <div className={`flex items-center ${sidebarCollapsed ? "mx-auto" : "pl-2"}`}>
+          <Link href="/" className="flex items-center gap-2">
+            <div className={`transition-all duration-300 ${sidebarCollapsed ? "scale-90" : ""}`}>
+              <Image
+                src="/cook-book.png"
+                alt="CookBook Logo"
+                width={40}
+                height={40}
+                style={{ width: "36px", height: "auto" }}
+                className="object-contain"
+              />
             </div>
+            {!sidebarCollapsed && (
+              <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-brand-primary to-brand-secondary bg-clip-text text-transparent">
+                CookBook Admin
+              </span>
+            )}
           </Link>
         </div>
 
-        {/* Toggle Button - Positioned Absolutely */}
-        <button
-          onClick={toggleSidebarCollapse}
-          className="absolute top-6 right-2 p-2 rounded-full bg-white dark:bg-gray-700 shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 hidden md:flex items-center justify-center"
-          title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          <ChevronLeft
-            className={`h-4 w-4 text-gray-600 dark:text-gray-300 transition-transform duration-300 ${
-              sidebarCollapsed ? "rotate-180" : ""
-            }`}
-          />
-        </button>
+        {/* Toggle Button - Collapsed state toggle */}
+        {!sidebarCollapsed ? (
+          <button
+            onClick={toggleSidebarCollapse}
+            className="p-1.5 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 hidden md:flex items-center justify-center"
+            title="Collapse sidebar"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+        ) : (
+          <button
+            onClick={toggleSidebarCollapse}
+            className="absolute -right-3 top-7 z-50 p-1 rounded-full border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 shadow-sm hidden md:flex items-center justify-center"
+            title="Expand sidebar"
+          >
+            <ChevronRight className="h-3 w-3" />
+          </button>
+        )}
 
         {/* Mobile Close Button */}
         <button
           onClick={() => setSidebarOpen(false)}
-          className="absolute top-6 right-4 p-2 rounded-full bg-white dark:bg-gray-700 shadow-md hover:bg-gray-100 dark:hover:bg-gray-600 md:hidden"
+          className="p-1.5 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-400 md:hidden"
         >
-          <ChevronLeft className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+          <ChevronLeft className="h-4 w-4" />
         </button>
       </div>
 
       {/* Divider */}
-      <div className="mx-4 mb-4 border-b border-gray-200 dark:border-gray-700"></div>
+      <div className="px-4 mb-4">
+        <div className="border-b border-gray-100 dark:border-gray-700"></div>
+      </div>
 
       {/* Navigation */}
-      <nav className="px-2 flex-1 overflow-hidden">
-        <ul className="space-y-1 overflow-y-auto h-full">
-          {menuItems.map(({ id, href, label, icon }) => (
-            <motion.li
-              key={id || label}
-              variants={menuItemVariants}
-              initial="hidden"
-              animate={isLayoutReady ? "visible" : "hidden"}
-            >
-              <Link
-                href={href}
-                className={`flex items-center px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 ${
-                  pathname === href
-                    ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                    : "text-gray-700 dark:text-gray-300"
-                } ${sidebarCollapsed ? "md:justify-center md:px-2" : ""}`}
-                title={sidebarCollapsed ? label : ""}
+      <nav className="px-3 flex-1 overflow-y-auto scrollbar-thin">
+        <ul className="space-y-1">
+          {menuItems.map(({ id, href, label, icon: Icon }) => {
+            const isActive = pathname === href;
+            return (
+              <motion.li
+                key={id}
+                variants={menuItemVariants}
+                initial="hidden"
+                animate={isLayoutReady ? "visible" : "hidden"}
               >
-                <div
-                  className={`flex items-center justify-center ${
-                    typeof icon === "string"
-                      ? "w-8 h-8 rounded-lg bg-white dark:bg-gray-700 shadow-sm"
-                      : ""
-                  }`}
+                <Link
+                  href={href}
+                  className={`flex items-center px-3.5 py-3 rounded-xl transition-all duration-200 ${
+                    isActive
+                      ? "bg-brand-primary text-brand-white shadow-sm font-semibold"
+                      : "text-gray-500 hover:text-brand-primary hover:bg-blue-50/40 dark:text-gray-300 dark:hover:bg-gray-700/50"
+                  } ${sidebarCollapsed ? "md:justify-center md:px-2" : ""}`}
+                  title={sidebarCollapsed ? label : ""}
                 >
-                  {typeof icon === "string" ? (
-                    <span
-                      className={`material-icons text-blue-600 dark:text-blue-400 ${
-                        sidebarCollapsed ? "text-xl" : "text-lg"
-                      }`}
-                    >
-                      {icon}
+                  <Icon className={`h-5 w-5 shrink-0 ${isActive ? "text-white" : "text-gray-400 group-hover:text-brand-primary"}`} />
+                  {!sidebarCollapsed && (
+                    <span className="ml-3 text-sm font-medium tracking-wide">
+                      {label}
                     </span>
-                  ) : (
-                    <div className="text-blue-600 dark:text-blue-400">
-                      {icon}
-                    </div>
                   )}
-                </div>
-                <span
-                  className={`ml-3 font-medium transition-opacity duration-200 ${
-                    sidebarCollapsed ? "md:hidden md:opacity-0" : "opacity-100"
-                  }`}
-                >
-                  {label}
-                </span>
-                {pathname === href && !sidebarCollapsed && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-600 dark:bg-blue-400"></div>
-                )}
-              </Link>
-            </motion.li>
-          ))}
+                </Link>
+              </motion.li>
+            );
+          })}
         </ul>
       </nav>
     </motion.aside>
