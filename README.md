@@ -1,10 +1,10 @@
 # CookBook
 
-A premium, modern recipe management platform built with Next.js 15, focusing on a vibrant community of chefs and food enthusiasts.
+A premium, modern recipe management platform built with Next.js 16, focusing on a vibrant community of chefs and food enthusiasts.
 
 ## 🚀 Tech Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Database**: [MongoDB](https://www.mongodb.com/) via [Prisma ORM](https://www.prisma.io/)
 - **Authentication**: [NextAuth.js](https://next-auth.js.org/)
 - **Styling**: [Tailwind CSS 4](https://tailwindcss.com/), [Framer Motion](https://www.framer.com/motion/)
@@ -15,12 +15,14 @@ A premium, modern recipe management platform built with Next.js 15, focusing on 
 ## Key Features
 
 - **Recipe Discovery**: Browse popular creations and recipes of the week.
-- **Categorization**: filter by diet, occasion, or cuisine.
+- **Categorization**: Filter recipes by diet, occasion, or cuisine (with custom sidebar navigation).
 - **User Profiles**: Manage your own culinary works and favorites.
 - **Community Interaction**: Rate and review recipes from other chefs.
-- **Image Support**: Multiple high-quality images per recipe via Cloudinary.
-- **Admin Dashboard**: Full control over content management.
-- **Responsive Design**: Optimized for both mobile and desktop experiences.
+- **Image Support**: Multiple high-quality images per recipe via Cloudinary, with custom fallback assets.
+- **Admin Dashboard**: Full control over content management (Categories, Occasions, Users, and Events).
+- **Glassmorphic Navigation**: Advanced Navbar featuring cursor-following underlines, expanding search focus, and dropdown layouts.
+- **Responsive Design**: Mobile-friendly optimizations including custom SVG morphing toggles and slide-down drawer navigations.
+- **Brand Pages**: Custom redesigned templates for About Us, Contact Us, FAQ (animated accordions), Privacy Policy, Disclaimer, and Terms of Service.
 
 ## 🛠️ Getting Started
 
