@@ -1,3 +1,5 @@
+* [ ] 
+
 # CookBook
 
 A premium, modern recipe management platform built with Next.js 16, focusing on a vibrant community of chefs and food enthusiasts.
@@ -28,25 +30,26 @@ A premium, modern recipe management platform built with Next.js 16, focusing on 
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - MongoDB Instance (Atlas or Local)
 - Cloudinary Account
 
 ### Installation
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/VibolSen/CookBooks.git
    cd CookBooks
    ```
-
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
-
 3. **Environment Setup:**
    Create a `.env` file in the root directory and add the following:
+
    ```env
    # Database
    MONGODB_URI="mongodb+srv://..."
@@ -64,13 +67,13 @@ A premium, modern recipe management platform built with Next.js 16, focusing on 
    GOOGLE_CLIENT_ID="..."
    GOOGLE_CLIENT_SECRET="..."
    ```
-
 4. **Prisma Setup:**
+
    ```bash
    npx prisma generate
    ```
-
 5. **Run Development Server:**
+
    ```bash
    npm run dev
    ```
