@@ -77,10 +77,11 @@ A premium, modern recipe management platform built with Next.js 16, focusing on 
 
 ## 📂 Project Structure
 
-- `/app`: Next.js App Router (Pages, Layouts, API)
-- `/app/actions`: Server Actions for database operations
-- `/app/components`: Reusable UI components
-- `/app/lib`: Shared utilities (Prisma client, Auth options)
+- `/src/app`: Next.js App Router (Pages, Layouts, API Routes)
+- `/src/actions`: Server Actions for database operations
+- `/src/components`: Reusable UI components & modals
+- `/src/context`: React context providers
+- `/src/lib`: Shared utilities (Prisma client, Auth options, Cloudinary)
 - `/prisma`: Database schema definition
 - `/public`: Static assets (Logos, Placeholders)
 
